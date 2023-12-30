@@ -1,1 +1,1 @@
-export * from './create';
+export { Label } from "./create";
