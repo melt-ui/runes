@@ -9,13 +9,17 @@ export default {
 	plugins: [
 		plugin(({ addComponents }) => {
 			addComponents({
-				".btn": tw(`
-					relative inline-flex h-10 items-center justify-center rounded-md border px-6
-					before:absolute before:inset-0 before:rounded-[inherit] before:opacity-0 before:transition-[opacity] before:duration-75
-					hover:before:bg-current hover:before:opacity-[0.08]
-					active:before:bg-current active:before:opacity-[0.12]
-					disabled:pointer-events-none disabled:border-neutral-300/[0.12] disabled:text-neutral-300/[0.38]
-				`),
+				".btn": {
+					...tw("relative inline-flex h-10 items-center justify-center rounded-md border px-6"),
+					...tw(
+						"before:absolute before:inset-0 before:rounded-[inherit] before:opacity-0 before:transition-[opacity] before:duration-75",
+					),
+					...tw("hover:before:bg-current hover:before:opacity-[0.08]"),
+					...tw("active:before:bg-current active:before:opacity-[0.12]"),
+					...tw(
+						"disabled:pointer-events-none disabled:border-neutral-300/[0.12] disabled:text-neutral-300/[0.38]",
+					),
+				},
 			});
 		}),
 	],
