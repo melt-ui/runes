@@ -32,6 +32,7 @@
 		"@sveltejs/package": "^2.2.5",
 		"@sveltejs/vite-plugin-svelte": "^3.0.1",
 		"@types/eslint": "8.56.0",
+		"@types/node": "^20.10.6",
 		"@typescript-eslint/eslint-plugin": "^6.16.0",
 		"@typescript-eslint/parser": "^6.16.0",
 		"autoprefixer": "^10.4.16",
@@ -50,6 +51,11 @@
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.3",
 		"vite": "^5.0.10"
+	},
+	"dependencies": {
+		"@floating-ui/core": "^1.5.2",
+		"@floating-ui/dom": "^1.5.3",
+		"nanoid": "^5.0.4"
 	},
 	"svelte": "./dist/index.js",
 	"types": "./dist/index.d.ts",

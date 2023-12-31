@@ -40,39 +40,3 @@ export const kbd = {
 	A: "a",
 	P: "p",
 };
-
-/** Key sets for navigation within lists, such as select, menu, and combobox. */
-export const FIRST_KEYS = [kbd.ARROW_DOWN, kbd.PAGE_UP, kbd.HOME];
-export const LAST_KEYS = [kbd.ARROW_UP, kbd.PAGE_DOWN, kbd.END];
-export const FIRST_LAST_KEYS = [...FIRST_KEYS, ...LAST_KEYS];
-export const SELECTION_KEYS = [kbd.ENTER, kbd.SPACE];
-
-export const getNextKey = (
-	dir: "ltr" | "rtl" = "ltr",
-	orientation: "horizontal" | "vertical" = "horizontal",
-) => {
-	return {
-		horizontal: dir === "rtl" ? kbd.ARROW_LEFT : kbd.ARROW_RIGHT,
-		vertical: kbd.ARROW_DOWN,
-	}[orientation];
-};
-
-export const getPrevKey = (
-	dir: "ltr" | "rtl" = "ltr",
-	orientation: "horizontal" | "vertical" = "horizontal",
-) => {
-	return {
-		horizontal: dir === "rtl" ? kbd.ARROW_RIGHT : kbd.ARROW_LEFT,
-		vertical: kbd.ARROW_UP,
-	}[orientation];
-};
-
-export const getDirectionalKeys = (
-	dir: "ltr" | "rtl" = "ltr",
-	orientation: "horizontal" | "vertical" = "horizontal",
-) => {
-	return {
-		nextKey: getNextKey(dir, orientation),
-		prevKey: getPrevKey(dir, orientation),
-	};
-};

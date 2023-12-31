@@ -2,8 +2,8 @@ import { disabledAttr, kbd } from "$lib/internal/helpers";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
-	pressed = $state(false);
-	disabled = $state(false);
+	pressed: boolean = $state(false);
+	disabled: boolean = $state(false);
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
@@ -11,34 +11,39 @@ export class Toggle {
 		this.disabled = disabled;
 	}
 
-	readonly root = createRoot(this);
-}
+	readonly root = this.createRoot();
 
-function createRoot(toggle: Toggle) {
-	const disabled = $derived(disabledAttr(toggle.disabled));
-	const dataState = $derived(toggle.pressed ? "on" : "off");
-	return {
-		get disabled() {
-			return disabled;
-		},
-		get "data-disabled"() {
-			return disabled;
-		},
-		get "data-state"() {
-			return dataState;
-		},
-		get "aria-pressed"() {
-			return toggle.pressed;
-		},
-		type: "button",
-		onclick() {
-			if (toggle.disabled) return;
-			toggle.pressed = !toggle.pressed;
-		},
-		onkeydown(e: KeyboardEvent) {
-			if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
-			e.preventDefault();
-			this.onclick();
-		},
-	} as const;
+	private createRoot() {
+		const self = this;
+		const disabled = $derived(disabledAttr(this.disabled));
+		const dataState = $derived(this.pressed ? "on" : "off");
+		return {
+			type: "button",
+			get disabled() {
+				return disabled;
+			},
+			get "data-disabled"() {
+				return disabled;
+			},
+			get "data-state"() {
+				return dataState;
+			},
+			get "aria-pressed"() {
+				return self.pressed;
+			},
+			onclick: this.handleClick.bind(this),
+			onkeydown: this.handleKeydown.bind(this),
+		} as const;
+	}
+
+	private handleClick() {
+		if (this.disabled) return;
+		this.pressed = !this.pressed;
+	}
+
+	private handleKeydown(e: KeyboardEvent) {
+		if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
+		e.preventDefault();
+		this.handleClick();
+	}
 }
