@@ -15,19 +15,13 @@ export function createToggle(props?: CreateToggleProps) {
 
 	const root = builder("toggle", {
 		props: {
-			type: { value: "button" },
-			disabled: {
-				get: () => disabled,
-			},
-			"data-disabled": {
-				get: () => disabled,
-			},
-			"data-state": {
-				get: () => dataState,
-			},
-			"aria-pressed": {
-				get: () => states.pressed,
-			},
+			type: "button",
+		} as const,
+		getters: {
+			disabled: () => disabled,
+			"data-disabled": () => disabled,
+			"data-state": () => dataState,
+			"aria-pressed": () => states.pressed,
 		} as const,
 		action: (node) => {
 			const destroy = executeCallbacks(
