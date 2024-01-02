@@ -19,17 +19,29 @@ export function builder<
 >(name: TName, args: BuilderArgs<TProps, TGetters, TAction> = {}) {
 	const { props, getters, action = () => {} } = args;
 
-	Object.defineProperty(action, `data-melt-${name}`, { value: "", enumerable: true });
+	Object.defineProperty(action, `data-melt-${name}`, {
+		value: "",
+		enumerable: true,
+	});
 
 	for (const key in props) {
-		Object.defineProperty(action, key, { value: props[key], enumerable: true });
+		Object.defineProperty(action, key, {
+			value: props[key],
+			enumerable: true,
+		});
 	}
 
 	for (const key in getters) {
-		Object.defineProperty(action, key, { get: getters[key], enumerable: true });
+		Object.defineProperty(action, key, {
+			get: getters[key],
+			enumerable: true,
+		});
 	}
 
-	Object.defineProperty(action, "action", { value: action, enumerable: false });
+	Object.defineProperty(action, "action", {
+		value: action,
+		enumerable: false,
+	});
 
 	return action as TAction & BuilderAttributes<TName, TProps, TGetters, TAction>;
 }
