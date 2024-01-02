@@ -12,10 +12,10 @@ export type BuilderArgs<
 };
 
 export function builder<
-	TName extends string,
-	TProps extends Record<string, unknown> = Record<never, never>,
-	TGetters extends Record<string, () => unknown> = Record<never, never>,
-	TAction extends Action = Action,
+	const TName extends string,
+	const TProps extends Record<string, unknown> = Record<never, never>,
+	const TGetters extends Record<string, () => unknown> = Record<never, never>,
+	const TAction extends Action = Action,
 >(name: TName, args: BuilderArgs<TProps, TGetters, TAction> = {}) {
 	const { props, getters, action = () => {} } = args;
 
