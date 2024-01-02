@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { createToggle } from "$lib";
+	import { melt } from "@melt-ui/svelte";
 
 	const { root, states } = createToggle({
 		onPressedChange: (pressed) => {
@@ -17,7 +18,7 @@
 		when using the spread operator.
 		`disabled={root.disabled}` is a temporary workaround.
 	-->
-	<button {...root} use:root disabled={root.disabled} class="btn">
+	<button use:melt={root} disabled={root.disabled} class="btn">
 		{#if states.pressed}
 			On
 		{:else}

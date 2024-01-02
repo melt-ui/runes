@@ -1,28 +1,30 @@
 import type { Prettify } from "../types";
 
-export type Properties = {
-	[key: string]: (() => unknown) | unknown;
+export type PropertyDescriptors = {
+	[key: string]:
+		| { value: unknown; enumerable?: boolean }
+		| { get: () => unknown; enumerable?: boolean };
 };
 
-export type ExtractPropertyValues<T extends Properties> = {
-	readonly [K in keyof T]: T[K] extends () => infer V ? V : T[K];
+type ExtractProperties<D extends PropertyDescriptors> = {
+	[K in keyof D]: D[K] extends { value: infer V }
+		? V
+		: D[K] extends { get: () => infer V }
+			? V
+			: never;
 };
 
-export function defineProperties<O, P extends Properties>(
+export function defineProperties<O, const D extends PropertyDescriptors>(
 	obj: O,
-	properties: P,
-): asserts obj is O & Prettify<ExtractPropertyValues<P>> {
-	for (const [key, value] of Object.entries(properties)) {
-		if (typeof value === "function") {
-			Object.defineProperty(obj, key, {
-				get: value as () => unknown,
-				enumerable: true,
-			});
-		} else {
-			Object.defineProperty(obj, key, {
-				value,
-				enumerable: true,
-			});
+	descriptors: D,
+): asserts obj is O & Prettify<ExtractProperties<D>> {
+	for (const [key, descriptor] of Object.entries(descriptors)) {
+		if ("value" in descriptor) {
+			const { value, enumerable = true } = descriptor;
+			Object.defineProperty(obj, key, { value, enumerable });
+		} else if ("get" in descriptor) {
+			const { get, enumerable = true } = descriptor;
+			Object.defineProperty(obj, key, { get, enumerable });
 		}
 	}
 }

@@ -16,8 +16,12 @@ export function createLabel() {
 	};
 
 	defineProperties(root, {
-		"data-melt-label": "",
-	} as const);
+		"data-melt-label": { value: "" },
+		action: {
+			value: root,
+			enumerable: false,
+		},
+	});
 
 	return {
 		root,
