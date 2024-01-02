@@ -15,7 +15,6 @@ export function createToggle(props?: CreateToggleProps) {
 
 	const root = builder("toggle", {
 		props: {
-			"data-melt-toggle": { value: "" },
 			type: { value: "button" },
 			disabled: {
 				get: () => disabled,
@@ -29,7 +28,7 @@ export function createToggle(props?: CreateToggleProps) {
 			"aria-pressed": {
 				get: () => states.pressed,
 			},
-		},
+		} as const,
 		action: (node) => {
 			const destroy = executeCallbacks(
 				addEventListener(node, "click", handleClick),
