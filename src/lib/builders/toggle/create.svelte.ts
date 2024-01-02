@@ -36,13 +36,12 @@ export function createToggle(props?: CreateToggleProps) {
 	const disabled = $derived(disabledAttr(states.disabled));
 	const dataState = $derived(states.pressed ? "on" : "off");
 	defineProperties(root, {
-		"data-melt-toggle": { value: "" },
-		type: { value: "button" },
-		disabled: { get: () => disabled },
-		"data-disabled": { get: () => disabled },
-		"data-state": { get: () => dataState },
-		"aria-pressed": { get: () => states.pressed },
-		action: { value: root, enumerable: false },
+		"data-melt-toggle": "",
+		type: "button",
+		disabled: () => disabled,
+		"data-disabled": () => disabled,
+		"data-state": () => dataState,
+		"aria-pressed": () => states.pressed,
 	} as const);
 
 	return {
