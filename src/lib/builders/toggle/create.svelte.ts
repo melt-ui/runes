@@ -1,49 +1,52 @@
-import { disabledAttr, kbd } from "$lib/internal/helpers";
-import type { ToggleProps } from "./types";
+import {
+	addEventListener,
+	defineProperties,
+	disabledAttr,
+	executeCallbacks,
+	kbd,
+} from "$lib/internal/helpers";
+import type { Action } from "svelte/action";
+import { ToggleStates } from "./states.svelte";
+import type { CreateToggleProps } from "./types";
 
-export class Toggle {
-	pressed: boolean = $state(false);
-	disabled: boolean = $state(false);
+export function createToggle(props?: CreateToggleProps) {
+	const states = new ToggleStates(props);
 
-	constructor(props: ToggleProps = {}) {
-		const { pressed = false, disabled = false } = props;
-		this.pressed = pressed;
-		this.disabled = disabled;
+	function handleClick() {
+		if (states.disabled) return;
+		states.pressed = !states.pressed;
 	}
 
-	readonly root = this.createRoot();
-
-	private createRoot() {
-		const self = this;
-		const disabled = $derived(disabledAttr(this.disabled));
-		const dataState = $derived(this.pressed ? "on" : "off");
-		return {
-			type: "button",
-			get disabled() {
-				return disabled;
-			},
-			get "data-disabled"() {
-				return disabled;
-			},
-			get "data-state"() {
-				return dataState;
-			},
-			get "aria-pressed"() {
-				return self.pressed;
-			},
-			onclick: this.handleClick.bind(this),
-			onkeydown: this.handleKeydown.bind(this),
-		} as const;
-	}
-
-	private handleClick() {
-		if (this.disabled) return;
-		this.pressed = !this.pressed;
-	}
-
-	private handleKeydown(e: KeyboardEvent) {
+	function handleKeyDown(e: KeyboardEvent) {
 		if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
 		e.preventDefault();
-		this.handleClick();
+		handleClick();
 	}
+
+	const root: Action<HTMLElement> = (node) => {
+		const destroy = executeCallbacks(
+			addEventListener(node, "click", handleClick),
+			addEventListener(node, "keydown", handleKeyDown),
+		);
+		return {
+			destroy,
+		};
+	};
+
+	const disabled = $derived(disabledAttr(states.disabled));
+	const dataState = $derived(states.pressed ? "on" : "off");
+	defineProperties(root, {
+		"data-melt-toggle": { value: "" },
+		type: { value: "button" },
+		disabled: { get: () => disabled },
+		"data-disabled": { get: () => disabled },
+		"data-state": { get: () => dataState },
+		"aria-pressed": { get: () => states.pressed },
+		action: { value: root, enumerable: false },
+	} as const);
+
+	return {
+		root,
+		states,
+	};
 }

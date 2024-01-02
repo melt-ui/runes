@@ -1,13 +1,13 @@
-import { tick } from 'svelte';
-import type { Action } from 'svelte/action';
-import { isHTMLElement, noop } from '$lib/internal/helpers/index.js';
+import { tick } from "svelte";
+import type { Action } from "svelte/action";
+import { isHTMLElement, noop } from "$lib/internal/helpers/index.js";
 
 export type PortalConfig = string | HTMLElement | undefined;
 
-export const usePortal: Action<HTMLElement, PortalConfig> = (el, target = 'body') => {
+export const usePortal: Action<HTMLElement, PortalConfig> = (el, target = "body") => {
 	let targetEl;
 
-	if (!isHTMLElement(target) && typeof target !== 'string') {
+	if (!isHTMLElement(target) && typeof target !== "string") {
 		return {
 			destroy: noop,
 		};
@@ -15,7 +15,7 @@ export const usePortal: Action<HTMLElement, PortalConfig> = (el, target = 'body'
 
 	async function update(newTarget: HTMLElement | string | undefined) {
 		target = newTarget;
-		if (typeof target === 'string') {
+		if (typeof target === "string") {
 			targetEl = document.querySelector(target);
 			if (targetEl === null) {
 				await tick();
@@ -29,11 +29,11 @@ export const usePortal: Action<HTMLElement, PortalConfig> = (el, target = 'body'
 		} else {
 			throw new TypeError(
 				`Unknown portal target type: ${
-					target === null ? 'null' : typeof target
-				}. Allowed types: string (CSS selector) or HTMLElement.`
+					target === null ? "null" : typeof target
+				}. Allowed types: string (CSS selector) or HTMLElement.`,
 			);
 		}
-		el.dataset.portal = '';
+		el.dataset.portal = "";
 		targetEl.appendChild(el);
 		el.hidden = false;
 	}

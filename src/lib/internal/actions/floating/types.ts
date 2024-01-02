@@ -7,7 +7,7 @@ import type { Boundary } from "@floating-ui/dom";
 /**
  * The floating element configuration.
  * @see https://floating-ui.com/
- * 
+ *
  * When `null`, the element won't use floating-ui.
  */
 export type FloatingConfig = {

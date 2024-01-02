@@ -1,14 +1,19 @@
 <script lang="ts">
-	import { Toggle } from "$lib";
+	import { createToggle } from "$lib";
 
-	const toggle = new Toggle();
+	const { root, states } = createToggle();
 
-	$inspect(toggle.pressed, toggle.disabled);
+	$inspect(states.pressed, states.disabled);
 </script>
 
 <div class="flex gap-24">
-	<button {...toggle.root} class="btn">
-		{#if toggle.pressed}
+	<!--
+		There is a bug in Svelte 5 where reactivity is lost
+		when using the spread operator.
+		`disabled={root.disabled}` is a temporary workaround.
+	-->
+	<button {...root} use:root disabled={root.disabled} class="btn">
+		{#if states.pressed}
 			On
 		{:else}
 			Off
@@ -16,7 +21,7 @@
 	</button>
 
 	<div class="flex items-center gap-2">
-		<label for="disabled">Disabled</label>
-		<input id="disabled" type="checkbox" bind:checked={toggle.disabled} />
+		<label for="disabled" class="select-none">Disabled</label>
+		<input id="disabled" type="checkbox" bind:checked={states.disabled} />
 	</div>
 </div>

@@ -1,11 +1,26 @@
-export class Label {
-	readonly root = {
-		onmousedown: this.handleMouseDown.bind(this),
-	} as const;
+import { addEventListener, defineProperties } from "$lib/internal/helpers";
+import type { Action } from "svelte/action";
 
-	private handleMouseDown(e: MouseEvent) {
+export function createLabel() {
+	function handleMouseDown(e: MouseEvent) {
 		if (!e.defaultPrevented && e.detail > 1) {
 			e.preventDefault();
 		}
 	}
+
+	const root: Action<HTMLElement> = (node) => {
+		const destroy = addEventListener(node, "mousedown", handleMouseDown);
+		return {
+			destroy,
+		};
+	};
+
+	defineProperties(root, {
+		"data-melt-label": { value: "" },
+		action: { value: root, enumerable: false },
+	} as const);
+
+	return {
+		root,
+	};
 }

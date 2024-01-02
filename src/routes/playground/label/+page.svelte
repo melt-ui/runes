@@ -1,10 +1,10 @@
 <script lang="ts">
-	import { Label } from "$lib";
+	import { createLabel } from "$lib";
 
-	const label = new Label();
+	const { root } = createLabel();
 </script>
 
 <div class="flex flex-col gap-1">
-	<label for="name" {...label.root}>Name</label>
+	<label for="name" {...root} use:root>Name</label>
 	<input id="name" type="text" />
 </div>
