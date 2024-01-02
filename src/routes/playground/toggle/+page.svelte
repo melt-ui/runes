@@ -1,7 +1,12 @@
 <script lang="ts">
 	import { createToggle } from "$lib";
 
-	const { root, states } = createToggle();
+	const { root, states } = createToggle({
+		onPressedChange: (pressed) => {
+			console.log("onPressedChange", pressed);
+			return pressed;
+		},
+	});
 
 	$inspect(states.pressed, states.disabled);
 </script>

@@ -1,4 +1,4 @@
-import type { NonEmptyArray } from '../types';
+import type { NonEmptyArray } from "../types";
 
 /**
  * A callback function that takes an array of arguments of type `T` and returns `void`.
@@ -17,7 +17,7 @@ export function executeCallbacks<T extends unknown[]>(
 ): (...args: T) => void {
 	return (...args) => {
 		for (const callback of callbacks) {
-			if (typeof callback === 'function') {
+			if (typeof callback === "function") {
 				callback(...args);
 			}
 		}
@@ -29,4 +29,11 @@ export function executeCallbacks<T extends unknown[]>(
  */
 export function noop() {
 	//
+}
+
+/**
+ * A function that returns the same value that was passed to it.
+ */
+export function identity<T>(value: T): T {
+	return value;
 }

@@ -1,8 +1,10 @@
+import type { ChangeFn } from "$lib/internal/types";
 import type { createToggle } from "./create.svelte";
 
 export type CreateToggleProps = {
-	disabled?: boolean;
 	pressed?: boolean;
+	onPressedChange?: ChangeFn<boolean>;
+	disabled?: boolean;
 };
 
 export type Toggle = ReturnType<typeof createToggle>;
