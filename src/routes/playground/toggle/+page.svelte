@@ -1,15 +1,15 @@
 <script lang="ts">
-	import { createToggle } from "$lib";
+	import { Toggle } from "$lib/builders/toggle";
 	import { melt } from "@melt-ui/svelte";
 
-	const { root, states } = createToggle({
+	const toggle = new Toggle({
 		onPressedChange: (pressed) => {
 			console.log("onPressedChange", pressed);
 			return pressed;
 		},
 	});
 
-	$inspect(states.pressed, states.disabled);
+	$inspect(toggle.pressed, toggle.disabled);
 </script>
 
 <div class="flex gap-24">
@@ -18,8 +18,8 @@
 		when using the spread operator.
 		`disabled={root.disabled}` is a temporary workaround.
 	-->
-	<button use:melt={root} disabled={root.disabled} class="btn">
-		{#if states.pressed}
+	<button use:melt={toggle.root} disabled={toggle.disabled} class="btn">
+		{#if toggle.pressed}
 			On
 		{:else}
 			Off
@@ -28,6 +28,6 @@
 
 	<div class="flex items-center gap-2">
 		<label for="disabled" class="select-none">Disabled</label>
-		<input id="disabled" type="checkbox" bind:checked={states.disabled} />
+		<input id="disabled" type="checkbox" bind:checked={toggle.disabled} />
 	</div>
 </div>

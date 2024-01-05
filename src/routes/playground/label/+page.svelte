@@ -1,11 +1,11 @@
 <script lang="ts">
-	import { createLabel } from "$lib";
+	import { Label } from "$lib/builders/label";
 	import { melt } from "@melt-ui/svelte";
 
-	const { root } = createLabel();
+	const label = new Label();
 </script>
 
 <div class="flex flex-col gap-1">
-	<label for="name" use:melt={root}>Name</label>
+	<label for="name" use:melt={label.root}>Name</label>
 	<input id="name" type="text" />
 </div>

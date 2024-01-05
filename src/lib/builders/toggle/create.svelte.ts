@@ -1,52 +1,60 @@
-import {
-	addEventListener,
-	builder,
-	disabledAttr,
-	executeCallbacks,
-	kbd,
-} from "$lib/internal/helpers";
-import { ToggleStates } from "./states.svelte";
-import type { CreateToggleProps } from "./types";
+import { builder, disabledAttr, identity, kbd } from "$lib/internal/helpers";
+import type { ChangeFn } from "$lib/internal/types";
+import type { ToggleProps } from "./types";
 
-export function createToggle(props?: CreateToggleProps) {
-	const states = new ToggleStates(props);
-	const disabled = $derived(disabledAttr(states.disabled));
-	const dataState = $derived(states.pressed ? "on" : "off");
+export class Toggle {
+	private _pressed: boolean = $state(false);
+	private onPressedChange: ChangeFn<boolean>;
+	disabled: boolean = $state(false);
 
-	const root = builder("toggle", {
-		props: {
-			type: "button",
-		},
-		getters: {
-			disabled: () => disabled,
-			"data-disabled": () => disabled,
-			"data-state": () => dataState,
-			"aria-pressed": () => states.pressed,
-		},
-		action: (node) => {
-			const destroy = executeCallbacks(
-				addEventListener(node, "click", handleClick),
-				addEventListener(node, "keydown", handleKeyDown),
-			);
-			return {
-				destroy,
-			};
-		},
-	});
-
-	function handleClick() {
-		if (states.disabled) return;
-		states.pressed = !states.pressed;
+	constructor(props: ToggleProps = {}) {
+		const { pressed = false, onPressedChange = identity, disabled = false } = props;
+		this._pressed = pressed;
+		this.onPressedChange = onPressedChange;
+		this.disabled = disabled;
 	}
 
-	function handleKeyDown(e: KeyboardEvent) {
+	get pressed() {
+		return this._pressed;
+	}
+
+	set pressed(value: boolean) {
+		this._pressed = this.onPressedChange(value);
+	}
+
+	readonly root = this.createRoot();
+
+	private createRoot() {
+		const self = this;
+		return builder("toggle", {
+			props: {
+				type: "button",
+				get disabled() {
+					return disabledAttr(self.disabled);
+				},
+				get "data-disabled"() {
+					return disabledAttr(self.disabled);
+				},
+				get "data-state"() {
+					return self.pressed ? "on" : "off";
+				},
+				get "aria-pressed"() {
+					return self.pressed;
+				},
+				onclick: this.handleClick.bind(this),
+				onkeydown: this.handleKeyDown.bind(this),
+			},
+		});
+	}
+
+	private handleClick() {
+		if (this.disabled) return;
+		this.pressed = !this.pressed;
+	}
+
+	private handleKeyDown(e: KeyboardEvent) {
 		if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
 		e.preventDefault();
-		handleClick();
+		this.handleClick();
 	}
-
-	return {
-		root,
-		states,
-	};
 }

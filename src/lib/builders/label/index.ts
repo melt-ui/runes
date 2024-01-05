@@ -1,2 +1,1 @@
-export * from "./create";
-export type * from "./types";
+export { Label } from "./create";
