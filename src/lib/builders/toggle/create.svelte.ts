@@ -1,4 +1,11 @@
-import { builder, disabledAttr, identity, kbd } from "$lib/internal/helpers";
+import {
+	addEventListener,
+	builder,
+	disabledAttr,
+	executeCallbacks,
+	identity,
+	kbd,
+} from "$lib/internal/helpers";
 import type { ChangeFn } from "$lib/internal/types";
 import type { ToggleProps } from "./types";
 
@@ -41,8 +48,15 @@ export class Toggle {
 				get "aria-pressed"() {
 					return self.pressed;
 				},
-				onclick: this.handleClick.bind(this),
-				onkeydown: this.handleKeyDown.bind(this),
+			},
+			action: (node) => {
+				const destroy = executeCallbacks(
+					addEventListener(node, "click", this.handleClick.bind(this)),
+					addEventListener(node, "keydown", this.handleKeyDown.bind(this)),
+				);
+				return {
+					destroy,
+				};
 			},
 		});
 	}

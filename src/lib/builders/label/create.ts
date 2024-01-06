@@ -1,9 +1,12 @@
-import { builder } from "$lib/internal/helpers";
+import { addEventListener, builder } from "$lib/internal/helpers";
 
 export class Label {
 	readonly root = builder("label", {
-		props: {
-			onmousedown: this.handleMouseDown.bind(this),
+		action: (node) => {
+			const destroy = addEventListener(node, "mousedown", this.handleMouseDown.bind(this));
+			return {
+				destroy,
+			};
 		},
 	});
 

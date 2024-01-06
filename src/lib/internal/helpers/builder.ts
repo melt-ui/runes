@@ -11,7 +11,7 @@ export type BuilderArgs<TProps, TAction> = {
 export function builder<
 	const TName extends string,
 	const TProps extends HTMLAttributes<HTMLElement> = Record<never, never>,
-	const TAction extends Action<HTMLElement> = () => void,
+	const TAction extends Action = Action,
 >(name: TName, args: BuilderArgs<TProps, TAction> = {}) {
 	const { props = {}, action = noop } = args;
 
