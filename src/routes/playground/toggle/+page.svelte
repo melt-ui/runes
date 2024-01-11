@@ -13,12 +13,7 @@
 </script>
 
 <div class="flex gap-24">
-	<!--
-		There is a bug in Svelte 5 where reactivity is lost
-		when using the spread operator.
-		`disabled={root.disabled}` is a temporary workaround.
-	-->
-	<button use:melt={toggle.root} disabled={toggle.disabled} class="btn">
+	<button use:melt={toggle.root} class="btn">
 		{#if toggle.pressed}
 			On
 		{:else}
