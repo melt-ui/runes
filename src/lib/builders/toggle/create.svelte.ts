@@ -1,17 +1,10 @@
-import {
-	addEventListener,
-	builder,
-	disabledAttr,
-	executeCallbacks,
-	identity,
-	kbd,
-} from "$lib/internal/helpers";
+import { builder, disabledAttr, identity, kbd } from "$lib/internal/helpers";
 import type { ChangeFn } from "$lib/internal/types";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
 	private _pressed: boolean = $state(false);
-	private onPressedChange: ChangeFn<boolean>;
+	private readonly onPressedChange: ChangeFn<boolean>;
 	disabled: boolean = $state(false);
 
 	constructor(props: ToggleProps = {}) {
@@ -48,27 +41,16 @@ export class Toggle {
 				get "aria-pressed"() {
 					return self.pressed;
 				},
-			},
-			action: (node) => {
-				const destroy = executeCallbacks(
-					addEventListener(node, "click", this.handleClick.bind(this)),
-					addEventListener(node, "keydown", this.handleKeyDown.bind(this)),
-				);
-				return {
-					destroy,
-				};
+				onclick() {
+					if (self.disabled) return;
+					self.pressed = !self.pressed;
+				},
+				onkeydown(e: KeyboardEvent) {
+					if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
+					e.preventDefault();
+					this.onclick();
+				},
 			},
 		});
-	}
-
-	private handleClick() {
-		if (this.disabled) return;
-		this.pressed = !this.pressed;
-	}
-
-	private handleKeyDown(e: KeyboardEvent) {
-		if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
-		e.preventDefault();
-		this.handleClick();
 	}
 }
