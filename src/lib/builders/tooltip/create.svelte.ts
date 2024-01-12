@@ -86,6 +86,8 @@ export class Tooltip {
 		this._open = this.onOpenChange(value);
 	}
 
+	private readonly isHidden = $derived(!this.open && !this.forceVisible);
+
 	private openReason: OpenReason | null = $state(null);
 	private isMouseInTooltipArea = false;
 	private clickedTrigger = false;
@@ -143,7 +145,22 @@ export class Tooltip {
 				}
 			});
 		});
+
+		$effect(() => {
+			return addEventListener(document, "keydown", this.handleKeyDown.bind(this));
+		});
 	});
+
+	private handleKeyDown(e: KeyboardEvent) {
+		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
+			if (this.openTimeout) {
+				window.clearTimeout(this.openTimeout);
+				this.openTimeout = null;
+			}
+
+			this.open = false;
+		}
+	}
 
 	private getEl(part: TooltipIdParts) {
 		if (!isBrowser) return null;
@@ -195,18 +212,6 @@ export class Tooltip {
 
 	private createTrigger() {
 		const self = this;
-
-		function handleKeyDown(e: KeyboardEvent) {
-			if (self.closeOnEscape && e.key === kbd.ESCAPE) {
-				if (self.openTimeout) {
-					window.clearTimeout(self.openTimeout);
-					self.openTimeout = null;
-				}
-
-				self.open = false;
-			}
-		}
-
 		return builder("tooltip-trigger", {
 			props: {
 				get "aria-describedby"() {
@@ -242,18 +247,10 @@ export class Tooltip {
 				onblur() {
 					self.closeTooltip(true);
 				},
-				onkeydown: handleKeyDown,
-			},
-			action() {
-				const destroy = addEventListener(document, "keydown", handleKeyDown);
-				return {
-					destroy,
-				};
+				onkeydown: this.handleKeyDown.bind(this),
 			},
 		});
 	}
-
-	private readonly isHidden = $derived(!this.open && !this.forceVisible);
 
 	readonly content = this.createContent();
 
