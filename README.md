@@ -1,58 +1,77 @@
-# create-svelte
+# Melt-UI Runes Experiment
 
-Everything you need to build a Svelte library, powered by [`create-svelte`](https://github.com/sveltejs/kit/tree/main/packages/create-svelte).
+## Introduction
+This is an experiment that aims to migrate existing Melt-UI builders to runes.
 
-Read more about creating a library [in the docs](https://kit.svelte.dev/docs/packaging).
+## New API
+The new API relies on classes instead of stores for creating builders.
 
-## Creating a project
+```svelte
+<!-- previously -->
+<script>
+    const {
+        elements: { trigger, content, arrow },
+        states: { open }
+    } = createTooltip({
+        forceVisible: true,
+        onOpenChange({ curr, next }) {
+            console.log("onOpenChange", curr, next);
+            return next;
+        }
+    });
+</script>
 
-If you're seeing this, you've probably already done this step. Congrats!
+<button use:melt={$trigger}>Trigger</button>
 
-```bash
-# create a new project in the current directory
-npm create svelte@latest
-
-# create a new project in my-app
-npm create svelte@latest my-app
+{#if $open}
+    <div use:melt={$content}>
+        <div use:melt={$arrow} />
+        <p>Hello world!</p>
+    </div>
+{/if}
 ```
 
-## Developing
+```svelte
+<!-- now -->
+<script>
+    const tooltip = new Tooltip({
+        forceVisible: true,
+        onOpenChange(next) {
+            const curr = tooltip.open;
+            console.log("onOpenChange", curr, next);
+            return next;
+        }
+    });
+</script>
 
-Once you've created a project and installed dependencies with `npm install` (or `pnpm install` or `yarn`), start a development server:
+<button use:melt={tooltip.trigger}>Trigger</button>
 
-```bash
-npm run dev
-
-# or start the server and open the app in a new browser tab
-npm run dev -- --open
+{#if tooltip.open}
+    <div use:melt={tooltip.content}>
+        <div use:melt={tooltip.open} />
+        <p>Hello world!</p>
+    </div>
+{/if}
 ```
 
-Everything inside `src/lib` is part of your library, everything inside `src/routes` can be used as a showcase or preview app.
+I hear you saying "Ugh, classes". Let me explain the reasoning behind this choice:
+1. They are more performant, especially with runes. No need for getters and setters for every state.
+2. Destructuring makes it hard to use multiple builders in the same page because you need to rename multiple variables. This is no longer the case with classes.
 
-## Building
-
-To build your library:
-
-```bash
-npm run package
-```
-
-To create a production version of your showcase app:
+## Usage
+Try out the new API yourself by cloning this repo.
 
 ```bash
-npm run build
+git clone https://github.com/abdel-17/melt-ui-runes-experiment
 ```
 
-You can preview the production build with `npm run preview`.
+You'll find three builders have been migrated to runes.
+1. Label
+2. Toggle
+3. Tooltip
 
-> To deploy your app, you may need to install an [adapter](https://kit.svelte.dev/docs/adapters) for your target environment.
-
-## Publishing
-
-Go into the `package.json` and give your package the desired name through the `"name"` option. Also consider adding a `"license"` field and point it to a `LICENSE` file which you can create from a template (one popular option is the [MIT license](https://opensource.org/license/mit/)).
-
-To publish your library to [npm](https://www.npmjs.com):
-
-```bash
-npm publish
+```ts
+import { Label, Toggle, Tooltip } from "$lib";
 ```
+
+You'll also find an example for each builder under the `src/routes/playground` directory.
