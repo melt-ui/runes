@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Tooltip } from "$lib/builders/tooltip";
-	import { melt } from "@melt-ui/svelte";
+	import { Tooltip, melt } from "$lib";
 	import { fade } from "svelte/transition";
 
 	const tooltip = new Tooltip({

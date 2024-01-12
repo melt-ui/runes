@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Label } from "$lib/builders/label";
-	import { melt } from "@melt-ui/svelte";
+	import { Label, melt } from "$lib";
 
 	const label = new Label();
 </script>

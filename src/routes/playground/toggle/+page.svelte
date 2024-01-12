@@ -1,6 +1,5 @@
 <script lang="ts">
-	import { Toggle } from "$lib/builders/toggle";
-	import { melt } from "@melt-ui/svelte";
+	import { Toggle, melt } from "$lib";
 
 	const toggle = new Toggle({
 		onPressedChange: (pressed) => {
