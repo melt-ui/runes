@@ -14,7 +14,7 @@ The new API relies on classes instead of stores for creating builders.
         states: { open }
     } = createTooltip({
         forceVisible: true,
-        onOpenChange({ curr, next }) {
+        onOpenChange: ({ curr, next }) => {
             console.log("onOpenChange", curr, next);
             return next;
         }
@@ -36,7 +36,7 @@ The new API relies on classes instead of stores for creating builders.
 <script>
     const tooltip = new Tooltip({
         forceVisible: true,
-        onOpenChange(next) {
+        onOpenChange: (next) => {
             const curr = tooltip.open;
             console.log("onOpenChange", curr, next);
             return next;
