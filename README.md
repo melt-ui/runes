@@ -48,7 +48,7 @@ The new API relies on classes instead of stores for creating builders.
 
 {#if tooltip.open}
     <div use:melt={tooltip.content}>
-        <div use:melt={tooltip.open} />
+        <div use:melt={tooltip.arrow} />
         <p>Hello world!</p>
     </div>
 {/if}
