@@ -1,6 +1,7 @@
 import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
 import {
 	addEventListener,
+	autodisposable,
 	builder,
 	generateId,
 	getPortalDestination,
@@ -15,7 +16,6 @@ import {
 	type IdObj,
 } from "$lib/internal/helpers";
 import type { ChangeFn } from "$lib/internal/types.js";
-import { onDestroy } from "svelte";
 import type { TooltipIdParts, TooltipProps } from "./types.js";
 
 // Store a global map to get the currently open tooltip in a given group.
@@ -69,24 +69,7 @@ export class Tooltip {
 		this.group = group;
 		this.ids.content = ids?.content ?? generateId();
 		this.ids.trigger = ids?.trigger ?? generateId();
-
-		try {
-			onDestroy(() => this.dispose());
-		} catch {
-			// Ignore the error. The user is responsible for manually
-			// cleaning up builders created outside Svelte components.
-		}
 	}
-
-	get open() {
-		return this._open;
-	}
-
-	set open(value) {
-		this._open = this.onOpenChange(value);
-	}
-
-	private readonly isHidden = $derived(!this.open && !this.forceVisible);
 
 	private openReason: OpenReason | null = $state(null);
 	private isMouseInTooltipArea = false;
@@ -94,7 +77,33 @@ export class Tooltip {
 	private openTimeout: number | null = null;
 	private closeTimeout: number | null = null;
 
-	readonly dispose = $effect.root(() => {
+	get open() {
+		return this._open;
+	}
+
+	set open(value) {
+		this._open = this.onOpenChange(value);
+		this.clearOpenTimeout();
+		this.clearCloseTimeout();
+	}
+
+	private clearOpenTimeout() {
+		if (this.openTimeout) {
+			window.clearTimeout(this.openTimeout);
+			this.openTimeout = null;
+		}
+	}
+
+	private clearCloseTimeout() {
+		if (this.closeTimeout) {
+			window.clearTimeout(this.closeTimeout);
+			this.closeTimeout = null;
+		}
+	}
+
+	private readonly isHidden = $derived(!this.open && !this.forceVisible);
+
+	readonly dispose = autodisposable(() => {
 		$effect(() => {
 			const group = this.group;
 			if (group === undefined || group === false) return;
@@ -153,11 +162,6 @@ export class Tooltip {
 
 	private handleKeyDown(e: KeyboardEvent) {
 		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
-			if (this.openTimeout) {
-				window.clearTimeout(this.openTimeout);
-				this.openTimeout = null;
-			}
-
 			this.open = false;
 		}
 	}
@@ -168,26 +172,19 @@ export class Tooltip {
 	}
 
 	private openTooltip(reason: OpenReason) {
-		if (this.closeTimeout) {
-			window.clearTimeout(this.closeTimeout);
-			this.closeTimeout = null;
-		}
+		this.clearCloseTimeout();
 
 		if (!this.openTimeout) {
 			this.openTimeout = window.setTimeout(() => {
 				this.open = true;
 				// Don't override the reason if it's already set.
 				this.openReason ??= reason;
-				this.openTimeout = null;
 			}, this.openDelay);
 		}
 	}
 
 	private closeTooltip(isBlur?: boolean) {
-		if (this.openTimeout) {
-			window.clearTimeout(this.openTimeout);
-			this.openTimeout = null;
-		}
+		this.clearOpenTimeout();
 
 		if (isBlur && this.isMouseInTooltipArea) {
 			// Normally when blurring the trigger, we want to close the tooltip.
@@ -203,7 +200,6 @@ export class Tooltip {
 				this.open = false;
 				this.openReason = null;
 				if (isBlur) this.clickedTrigger = false;
-				this.closeTimeout = null;
 			}, this.closeDelay);
 		}
 	}
@@ -224,10 +220,6 @@ export class Tooltip {
 					if (!self.closeOnPointerDown) return;
 					self.open = false;
 					self.clickedTrigger = true;
-					if (self.openTimeout) {
-						window.clearTimeout(self.openTimeout);
-						self.openTimeout = null;
-					}
 				},
 				onpointerenter(e: PointerEvent) {
 					if (isTouch(e)) return;
@@ -235,10 +227,7 @@ export class Tooltip {
 				},
 				onpointerleave(e: PointerEvent) {
 					if (isTouch(e)) return;
-					if (self.openTimeout) {
-						window.clearTimeout(self.openTimeout);
-						self.openTimeout = null;
-					}
+					self.clearOpenTimeout();
 				},
 				onfocus() {
 					if (self.clickedTrigger) return;

@@ -6,5 +6,6 @@ export * from "./event";
 export * from "./id";
 export * from "./is";
 export * from "./keyboard";
+export * from "./lifecycle.svelte";
 export * from "./polygon";
 export * from "./style";
