@@ -101,7 +101,9 @@ export class Tooltip {
 		}
 	}
 
-	readonly #isHidden = $derived(!this.open && !this.forceVisible);
+	get #isHidden() {
+		return !this.open && !this.forceVisible
+	}
 
 	readonly dispose = autodisposable(() => {
 		$effect(() => {
