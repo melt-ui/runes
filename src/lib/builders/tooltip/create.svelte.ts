@@ -26,8 +26,8 @@ type OpenReason = "pointer" | "focus";
 export class Tooltip {
 	positioning: FloatingConfig = $state(null);
 	arrowSize: number = $state(0);
-	private _open: boolean = $state(false);
-	private readonly onOpenChange: ChangeFn<boolean>;
+	#open: boolean = $state(false);
+	readonly #onOpenChange: ChangeFn<boolean>;
 	closeOnPointerDown: boolean = $state(false);
 	openDelay: number = $state(0);
 	closeDelay: number = $state(0);
@@ -57,8 +57,8 @@ export class Tooltip {
 
 		this.positioning = positioning;
 		this.arrowSize = arrowSize;
-		this._open = open;
-		this.onOpenChange = onOpenChange;
+		this.#open = open;
+		this.#onOpenChange = onOpenChange;
 		this.closeOnPointerDown = closeOnPointerDown;
 		this.openDelay = openDelay;
 		this.closeDelay = closeDelay;
@@ -71,37 +71,37 @@ export class Tooltip {
 		this.ids.trigger = ids?.trigger ?? generateId();
 	}
 
-	private openReason: OpenReason | null = $state(null);
-	private isMouseInTooltipArea = false;
-	private clickedTrigger = false;
-	private openTimeout: number | null = null;
-	private closeTimeout: number | null = null;
+	 #openReason: OpenReason | null = $state(null);
+	 #isMouseInTooltipArea = false;
+	 #clickedTrigger = false;
+	 #openTimeout: number | null = null;
+	 #closeTimeout: number | null = null;
 
 	get open() {
-		return this._open;
+		return this.#open;
 	}
 
 	set open(value) {
-		this._open = this.onOpenChange(value);
-		this.clearOpenTimeout();
-		this.clearCloseTimeout();
+		this.#open = this.#onOpenChange(value);
+		this.#clearOpenTimeout();
+		this.#clearCloseTimeout();
 	}
 
-	private clearOpenTimeout() {
-		if (this.openTimeout) {
-			window.clearTimeout(this.openTimeout);
-			this.openTimeout = null;
+	#clearOpenTimeout() {
+		if (this.#openTimeout) {
+			window.clearTimeout(this.#openTimeout);
+			this.#openTimeout = null;
 		}
 	}
 
-	private clearCloseTimeout() {
-		if (this.closeTimeout) {
-			window.clearTimeout(this.closeTimeout);
-			this.closeTimeout = null;
+	#clearCloseTimeout() {
+		if (this.#closeTimeout) {
+			window.clearTimeout(this.#closeTimeout);
+			this.#closeTimeout = null;
 		}
 	}
 
-	private readonly isHidden = $derived(!this.open && !this.forceVisible);
+	readonly #isHidden = $derived(!this.open && !this.forceVisible);
 
 	readonly dispose = autodisposable(() => {
 		$effect(() => {
@@ -132,14 +132,14 @@ export class Tooltip {
 		$effect(() => {
 			if (!this.open) return;
 			return addEventListener(document, "mousemove", (e) => {
-				const contentEl = this.getEl("content");
-				const triggerEl = this.getEl("trigger");
+				const contentEl = this.#getEl("content");
+				const triggerEl = this.#getEl("trigger");
 				if (!contentEl || !triggerEl) return;
 
 				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
 				const polygon = makeHullFromElements(polygonElements);
 
-				this.isMouseInTooltipArea = pointInPolygon(
+				this.#isMouseInTooltipArea = pointInPolygon(
 					{
 						x: e.clientX,
 						y: e.clientY,
@@ -147,66 +147,66 @@ export class Tooltip {
 					polygon,
 				);
 
-				if (this.openReason !== "pointer") return;
+				if (this.#openReason !== "pointer") return;
 
-				if (!this.isMouseInTooltipArea) {
-					this.closeTooltip();
+				if (!this.#isMouseInTooltipArea) {
+					this.#closeTooltip();
 				}
 			});
 		});
 
 		$effect(() => {
-			return addEventListener(document, "keydown", this.handleKeyDown.bind(this));
+			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
 		});
 	});
 
-	private handleKeyDown(e: KeyboardEvent) {
+	#handleKeyDown(e: KeyboardEvent) {
 		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
 			this.open = false;
 		}
 	}
 
-	private getEl(part: TooltipIdParts) {
+	#getEl(part: TooltipIdParts) {
 		if (!isBrowser) return null;
 		return document.getElementById(this.ids[part]);
 	}
 
-	private openTooltip(reason: OpenReason) {
-		this.clearCloseTimeout();
+	#openTooltip(reason: OpenReason) {
+		this.#clearCloseTimeout();
 
-		if (!this.openTimeout) {
-			this.openTimeout = window.setTimeout(() => {
+		if (!this.#openTimeout) {
+			this.#openTimeout = window.setTimeout(() => {
 				this.open = true;
 				// Don't override the reason if it's already set.
-				this.openReason ??= reason;
+				this.#openReason ??= reason;
 			}, this.openDelay);
 		}
 	}
 
-	private closeTooltip(isBlur?: boolean) {
-		this.clearOpenTimeout();
+	#closeTooltip(isBlur?: boolean) {
+		this.#clearOpenTimeout();
 
-		if (isBlur && this.isMouseInTooltipArea) {
+		if (isBlur && this.#isMouseInTooltipArea) {
 			// Normally when blurring the trigger, we want to close the tooltip.
 			// The exception is when the mouse is still in the tooltip area.
 			// In that case, we have to set the openReason to pointer, so that
 			// it can close when the mouse leaves the tooltip area.
-			this.openReason = "pointer";
+			this.#openReason = "pointer";
 			return;
 		}
 
-		if (!this.closeTimeout) {
-			this.closeTimeout = window.setTimeout(() => {
+		if (!this.#closeTimeout) {
+			this.#closeTimeout = window.setTimeout(() => {
 				this.open = false;
-				this.openReason = null;
-				if (isBlur) this.clickedTrigger = false;
+				this.#openReason = null;
+				if (isBlur) this.#clickedTrigger = false;
 			}, this.closeDelay);
 		}
 	}
 
-	readonly trigger = this.createTrigger();
+	readonly trigger = this.#createTrigger();
 
-	private createTrigger() {
+	#createTrigger() {
 		const self = this;
 		return builder("tooltip-trigger", {
 			props: {
@@ -219,41 +219,41 @@ export class Tooltip {
 				onpointerdown() {
 					if (!self.closeOnPointerDown) return;
 					self.open = false;
-					self.clickedTrigger = true;
+					self.#clickedTrigger = true;
 				},
 				onpointerenter(e: PointerEvent) {
 					if (isTouch(e)) return;
-					self.openTooltip("pointer");
+					self.#openTooltip("pointer");
 				},
 				onpointerleave(e: PointerEvent) {
 					if (isTouch(e)) return;
-					self.clearOpenTimeout();
+					self.#clearOpenTimeout();
 				},
 				onfocus() {
-					if (self.clickedTrigger) return;
-					self.openTooltip("focus");
+					if (self.#clickedTrigger) return;
+					self.#openTooltip("focus");
 				},
 				onblur() {
-					self.closeTooltip(true);
+					self.#closeTooltip(true);
 				},
-				onkeydown: this.handleKeyDown.bind(this),
+				onkeydown: this.#handleKeyDown.bind(this),
 			},
 		});
 	}
 
-	readonly content = this.createContent();
+	readonly content = this.#createContent();
 
-	private createContent() {
+	#createContent() {
 		const self = this;
 		return builder("tooltip-content", {
 			props: {
 				role: "tooltip",
 				tabindex: -1,
 				get hidden() {
-					return self.isHidden ? true : undefined;
+					return self.#isHidden ? true : undefined;
 				},
 				get style() {
-					return self.isHidden ? "display: none;" : undefined;
+					return self.#isHidden ? "display: none;" : undefined;
 				},
 				get id() {
 					return self.ids.content;
@@ -262,10 +262,10 @@ export class Tooltip {
 					return self.portal ? "" : undefined;
 				},
 				onpointerenter() {
-					self.openTooltip("pointer");
+					self.#openTooltip("pointer");
 				},
 				onpointerdown() {
-					self.openTooltip("pointer");
+					self.#openTooltip("pointer");
 				},
 			},
 			action(node: HTMLElement) {
@@ -274,8 +274,8 @@ export class Tooltip {
 
 				const unsubEffect = $effect.root(() => {
 					$effect(() => {
-						const triggerEl = self.getEl("trigger");
-						if (!triggerEl || self.isHidden) {
+						const triggerEl = self.#getEl("trigger");
+						if (!triggerEl || self.#isHidden) {
 							unsubPortal();
 							unsubFloating();
 							return;
@@ -309,9 +309,9 @@ export class Tooltip {
 		});
 	}
 
-	readonly arrow = this.createArrow();
+	readonly arrow = this.#createArrow();
 
-	private createArrow() {
+	#createArrow() {
 		const self = this;
 		return builder("tooltip-arrow", {
 			props: {

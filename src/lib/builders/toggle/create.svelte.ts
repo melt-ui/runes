@@ -3,28 +3,28 @@ import type { ChangeFn } from "$lib/internal/types";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
-	private _pressed: boolean = $state(false);
-	private readonly onPressedChange: ChangeFn<boolean>;
+	#pressed: boolean = $state(false);
+	readonly #onPressedChange: ChangeFn<boolean>;
 	disabled: boolean = $state(false);
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, onPressedChange = identity, disabled = false } = props;
-		this._pressed = pressed;
-		this.onPressedChange = onPressedChange;
+		this.#pressed = pressed;
+		this.#onPressedChange = onPressedChange;
 		this.disabled = disabled;
 	}
 
 	get pressed() {
-		return this._pressed;
+		return this.#pressed;
 	}
 
 	set pressed(value: boolean) {
-		this._pressed = this.onPressedChange(value);
+		this.#pressed = this.#onPressedChange(value);
 	}
 
-	readonly root = this.createRoot();
+	readonly root = this.#createRoot();
 
-	private createRoot() {
+	#createRoot() {
 		const self = this;
 		return builder("toggle", {
 			props: {
