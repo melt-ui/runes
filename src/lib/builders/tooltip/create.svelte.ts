@@ -71,11 +71,11 @@ export class Tooltip {
 		this.ids.trigger = ids?.trigger ?? generateId();
 	}
 
-	 #openReason: OpenReason | null = $state(null);
-	 #isMouseInTooltipArea = false;
-	 #clickedTrigger = false;
-	 #openTimeout: number | null = null;
-	 #closeTimeout: number | null = null;
+	#openReason: OpenReason | null = $state(null);
+	#isMouseInTooltipArea = false;
+	#clickedTrigger = false;
+	#openTimeout: number | null = null;
+	#closeTimeout: number | null = null;
 
 	get open() {
 		return this.#open;
@@ -101,71 +101,8 @@ export class Tooltip {
 		}
 	}
 
-	get #isHidden() {
-		return !this.open && !this.forceVisible
-	}
-
-	readonly dispose = autodisposable(() => {
-		$effect(() => {
-			const group = this.group;
-			if (group === undefined || group === false) return;
-
-			const cleanup = () => {
-				if (openTooltips.get(group) === this) {
-					openTooltips.delete(group);
-				}
-			};
-
-			if (!this.open) {
-				cleanup();
-				return;
-			}
-
-			// Close the currently open tooltip in the same group
-			// and set this tooltip as the open one.
-			const openTooltip = openTooltips.get(group);
-			if (openTooltip && openTooltip !== this) {
-				openTooltip.open = false;
-			}
-			openTooltips.set(group, this);
-			return cleanup;
-		});
-
-		$effect(() => {
-			if (!this.open) return;
-			return addEventListener(document, "mousemove", (e) => {
-				const contentEl = this.#getEl("content");
-				const triggerEl = this.#getEl("trigger");
-				if (!contentEl || !triggerEl) return;
-
-				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
-				const polygon = makeHullFromElements(polygonElements);
-
-				this.#isMouseInTooltipArea = pointInPolygon(
-					{
-						x: e.clientX,
-						y: e.clientY,
-					},
-					polygon,
-				);
-
-				if (this.#openReason !== "pointer") return;
-
-				if (!this.#isMouseInTooltipArea) {
-					this.#closeTooltip();
-				}
-			});
-		});
-
-		$effect(() => {
-			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
-		});
-	});
-
-	#handleKeyDown(e: KeyboardEvent) {
-		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
-			this.open = false;
-		}
+	get #hidden() {
+		return !this.open && !this.forceVisible;
 	}
 
 	#getEl(part: TooltipIdParts) {
@@ -243,6 +180,12 @@ export class Tooltip {
 		});
 	}
 
+	#handleKeyDown(e: KeyboardEvent) {
+		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
+			this.open = false;
+		}
+	}
+
 	readonly content = this.#createContent();
 
 	#createContent() {
@@ -252,10 +195,10 @@ export class Tooltip {
 				role: "tooltip",
 				tabindex: -1,
 				get hidden() {
-					return self.#isHidden ? true : undefined;
+					return self.#hidden ? true : undefined;
 				},
 				get style() {
-					return self.#isHidden ? "display: none;" : undefined;
+					return self.#hidden ? "display: none;" : undefined;
 				},
 				get id() {
 					return self.ids.content;
@@ -269,44 +212,6 @@ export class Tooltip {
 				onpointerdown() {
 					self.#openTooltip("pointer");
 				},
-			},
-			action(node: HTMLElement) {
-				let unsubFloating = noop;
-				let unsubPortal = noop;
-
-				const unsubEffect = $effect.root(() => {
-					$effect(() => {
-						const triggerEl = self.#getEl("trigger");
-						if (!triggerEl || self.#isHidden) {
-							unsubPortal();
-							unsubFloating();
-							return;
-						}
-
-						const floatingReturn = useFloating(triggerEl, node, self.positioning);
-						unsubFloating = floatingReturn.destroy;
-						if (!self.portal) {
-							unsubPortal();
-							return;
-						}
-
-						const portalDest = getPortalDestination(node, self.portal);
-						if (portalDest) {
-							const portalReturn = usePortal(node, portalDest);
-							if (portalReturn && portalReturn.destroy) {
-								unsubPortal = portalReturn.destroy;
-							}
-						}
-					});
-				});
-
-				return {
-					destroy() {
-						unsubPortal();
-						unsubFloating();
-						unsubEffect();
-					},
-				};
 			},
 		});
 	}
@@ -329,4 +234,96 @@ export class Tooltip {
 			},
 		});
 	}
+
+	readonly dispose = autodisposable(() => {
+		$effect(() => {
+			const group = this.group;
+			if (group === undefined || group === false) return;
+
+			const cleanup = () => {
+				if (openTooltips.get(group) === this) {
+					openTooltips.delete(group);
+				}
+			};
+
+			if (!this.open) {
+				cleanup();
+				return;
+			}
+
+			// Close the currently open tooltip in the same group
+			// and set this tooltip as the open one.
+			const openTooltip = openTooltips.get(group);
+			if (openTooltip && openTooltip !== this) {
+				openTooltip.open = false;
+			}
+			openTooltips.set(group, this);
+			return cleanup;
+		});
+
+		$effect(() => {
+			if (!this.open) return;
+			return addEventListener(document, "mousemove", (e) => {
+				const contentEl = this.#getEl("content");
+				const triggerEl = this.#getEl("trigger");
+				if (!contentEl || !triggerEl) return;
+
+				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
+				const polygon = makeHullFromElements(polygonElements);
+
+				this.#isMouseInTooltipArea = pointInPolygon(
+					{
+						x: e.clientX,
+						y: e.clientY,
+					},
+					polygon,
+				);
+
+				if (this.#openReason !== "pointer") return;
+
+				if (!this.#isMouseInTooltipArea) {
+					this.#closeTooltip();
+				}
+			});
+		});
+
+		$effect(() => {
+			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
+		});
+
+		let unsubFloating = noop;
+		let unsubPortal = noop;
+
+		$effect(() => {
+			if (this.#hidden) return;
+
+			const triggerEl = this.#getEl("trigger");
+			const contentEl = this.#getEl("content");
+			if (!triggerEl || !contentEl) {
+				unsubFloating();
+				unsubPortal();
+				return;
+			}
+
+			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
+			unsubFloating = floatingReturn.destroy;
+			if (!this.portal) {
+				unsubFloating();
+				return;
+			}
+
+			const portalDest = getPortalDestination(contentEl, this.portal);
+			if (portalDest) {
+				const portalReturn = usePortal(contentEl, portalDest);
+				if (portalReturn && portalReturn.destroy) {
+					unsubPortal = portalReturn.destroy;
+				}
+			}
+		});
+
+		return () => {
+			unsubFloating();
+			unsubPortal();
+		};
+	});
 }

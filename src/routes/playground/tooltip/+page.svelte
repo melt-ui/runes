@@ -5,7 +5,7 @@
 	const tooltip = new Tooltip({
 		openDelay: 0,
 		closeDelay: 1000,
-		forceVisible: true,
+		forceVisible: false,
 		onOpenChange: (open) => {
 			console.log("onOpenChange", open);
 			return open;
