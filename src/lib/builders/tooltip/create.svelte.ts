@@ -2,7 +2,7 @@ import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actio
 import {
 	addEventListener,
 	autodisposable,
-	builder,
+	element,
 	generateId,
 	getPortalDestination,
 	identity,
@@ -26,8 +26,6 @@ type OpenReason = "pointer" | "focus";
 export class Tooltip {
 	positioning: FloatingConfig = $state(null);
 	arrowSize: number = $state(0);
-	#open: boolean = $state(false);
-	readonly #onOpenChange: ChangeFn<boolean>;
 	closeOnPointerDown: boolean = $state(false);
 	openDelay: number = $state(0);
 	closeDelay: number = $state(0);
@@ -37,6 +35,9 @@ export class Tooltip {
 	group: string | boolean | undefined = $state();
 	portal: HTMLElement | string | null = $state(null);
 	ids: IdObj<TooltipIdParts> = $state({ content: "", trigger: "" });
+
+	#open: boolean = $state(false);
+	readonly #onOpenChange: ChangeFn<boolean>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -77,6 +78,7 @@ export class Tooltip {
 	#openTimeout: number | null = null;
 	#closeTimeout: number | null = null;
 
+	// States
 	get open() {
 		return this.#open;
 	}
@@ -87,6 +89,12 @@ export class Tooltip {
 		this.#clearCloseTimeout();
 	}
 
+	get #hidden() {
+		return !this.open && !this.forceVisible;
+	}
+
+
+	// Helpers
 	#clearOpenTimeout() {
 		if (this.#openTimeout) {
 			window.clearTimeout(this.#openTimeout);
@@ -101,14 +109,11 @@ export class Tooltip {
 		}
 	}
 
-	get #hidden() {
-		return !this.open && !this.forceVisible;
-	}
-
 	#getEl(part: TooltipIdParts) {
 		if (!isBrowser) return null;
 		return document.getElementById(this.ids[part]);
 	}
+
 
 	#openTooltip(reason: OpenReason) {
 		this.#clearCloseTimeout();
@@ -143,11 +148,18 @@ export class Tooltip {
 		}
 	}
 
+	#handleKeyDown(e: KeyboardEvent) {
+		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
+			this.open = false;
+		}
+	}
+
+	// Elements
 	readonly trigger = this.#createTrigger();
 
 	#createTrigger() {
 		const self = this;
-		return builder("tooltip-trigger", {
+		return element("tooltip-trigger", {
 			props: {
 				get "aria-describedby"() {
 					return self.ids.content;
@@ -175,22 +187,16 @@ export class Tooltip {
 				onblur() {
 					self.#closeTooltip(true);
 				},
-				onkeydown: this.#handleKeyDown.bind(this),
+				onkeydown: self.#handleKeyDown.bind(self),
 			},
 		});
-	}
-
-	#handleKeyDown(e: KeyboardEvent) {
-		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
-			this.open = false;
-		}
 	}
 
 	readonly content = this.#createContent();
 
 	#createContent() {
 		const self = this;
-		return builder("tooltip-content", {
+		return element("tooltip-content", {
 			props: {
 				role: "tooltip",
 				tabindex: -1,
@@ -220,7 +226,7 @@ export class Tooltip {
 
 	#createArrow() {
 		const self = this;
-		return builder("tooltip-arrow", {
+		return element("tooltip-arrow", {
 			props: {
 				"data-arrow": true,
 				get style() {

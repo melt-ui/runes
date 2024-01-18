@@ -1,4 +1,4 @@
-import { builder, disabledAttr, identity, kbd } from "$lib/internal/helpers";
+import { element, disabledAttr, identity, kbd } from "$lib/internal/helpers";
 import type { ChangeFn } from "$lib/internal/types";
 import type { ToggleProps } from "./types";
 
@@ -26,7 +26,7 @@ export class Toggle {
 
 	#createRoot() {
 		const self = this;
-		return builder("toggle", {
+		return element("toggle", {
 			props: {
 				type: "button",
 				get disabled() {
@@ -54,3 +54,9 @@ export class Toggle {
 		});
 	}
 }
+
+// export function createToggle(props: ToggleProps = {}) {
+// 	let pressed = $state(props.pressed ?? false);
+// 	let disabled = $state(props.disabled ?? false);
+// 	const onPressedChange = props.onPressedChange ?? identity;
+// }

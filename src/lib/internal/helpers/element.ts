@@ -3,16 +3,16 @@ import type { HTMLAttributes } from "svelte/elements";
 import type { Prettify } from "../types";
 import { noop } from "./callbacks";
 
-export type BuilderArgs<TProps, TAction> = {
+export type ElementArgs<TProps, TAction> = {
 	props?: TProps;
 	action?: TAction;
 };
 
-export function builder<
+export function element<
 	const TName extends string,
 	const TProps extends HTMLAttributes<HTMLElement> = Record<never, never>,
 	const TAction extends Action = () => void,
->(name: TName, args: BuilderArgs<TProps, TAction> = {}) {
+>(name: TName, args: ElementArgs<TProps, TAction> = {}) {
 	const { props = {}, action = noop } = args;
 
 	Object.defineProperty(props, `data-melt-${name}`, {
@@ -25,10 +25,10 @@ export function builder<
 		enumerable: false,
 	});
 
-	return props as Builder<TName, TProps, TAction>;
+	return props as Element<TName, TProps, TAction>;
 }
 
-export type Builder<
+export type Element<
 	TName extends string,
 	TProps extends HTMLAttributes<HTMLElement>,
 	TAction extends Action<HTMLElement>,
