@@ -1,17 +1,18 @@
 <script lang="ts">
 	import { Toggle, createToggle } from "$lib";
+	import { controlled } from "$lib/internal/helpers";
 
 	let pressed = $state(false);
 
 	const toggle = new Toggle({
-		pressed: {
+		pressed: controlled({
 			get() {
 				return pressed;
 			},
 			set(value) {
 				pressed = value;
 			},
-		},
+		}),
 	});
 
 	$inspect(toggle.pressed, toggle.disabled);

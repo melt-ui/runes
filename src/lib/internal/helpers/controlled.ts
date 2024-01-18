@@ -1,13 +1,17 @@
 const MELT_CONTROLLED_SYMBOL = Symbol("MELT_CONTROLLED_SYMBOL");
 
-export type ControlledProp<T> = {
+export type ControlledArgs<T> = {
 	get: () => T;
 	set: (value: T) => void;
 };
 
-export function controlled<T>(value: ControlledProp<T>): ControlledProp<T> {
+export type ControlledProp<T> = ControlledArgs<T> & {
+	[MELT_CONTROLLED_SYMBOL]: true;
+};
+
+export function controlled<T>(value: ControlledArgs<T>): ControlledProp<T> {
 	Object.defineProperty(value, MELT_CONTROLLED_SYMBOL, true);
-	return value;
+	return value as ControlledProp<T>;
 }
 
 export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
