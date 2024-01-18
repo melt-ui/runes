@@ -9,20 +9,20 @@ export type ControlledProp<T> = ControlledArgs<T> & {
 	[MELT_CONTROLLED_SYMBOL]: true;
 };
 
-export function controlled<T>(value: ControlledArgs<T>): ControlledProp<T> {
-	return Object.assign(value, { [MELT_CONTROLLED_SYMBOL]: true } as const);
+export function controlled<T>(args: ControlledArgs<T>): ControlledProp<T> {
+	return Object.assign(args, { [MELT_CONTROLLED_SYMBOL]: true } as const);
 }
 
-export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
+export type ControllableProp<T> = T | ControlledProp<T>;
+
+export function isControlledProp<T>(value: ControllableProp<T>): value is ControlledProp<T> {
 	return typeof value === "object" && value !== null && MELT_CONTROLLED_SYMBOL in value;
 }
 
-export type SyncableProp<T> = T | ControlledProp<T>;
+export class Syncable<T> {
+	#prop = $state() as ControllableProp<T>;
 
-export class Prop<T> {
-	#prop = $state() as SyncableProp<T>;
-
-	constructor(prop: SyncableProp<T>) {
+	constructor(prop: ControllableProp<T>) {
 		this.#prop = prop;
 	}
 

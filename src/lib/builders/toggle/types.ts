@@ -1,6 +1,6 @@
-import type { SyncableProp } from "$lib/internal/helpers";
+import type { ControllableProp } from "$lib/internal/helpers";
 
 export type ToggleProps = {
-	pressed?: SyncableProp<boolean>;
-	disabled?: SyncableProp<boolean>;
+	pressed?: ControllableProp<boolean>;
+	disabled?: ControllableProp<boolean>;
 };
