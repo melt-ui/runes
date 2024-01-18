@@ -9,8 +9,8 @@ import {
 import type { ToggleProps } from "./types";
 
 export class Toggle {
-	#pressed = $state() as Prop<boolean>;
-	#disabled = $state() as Prop<boolean>;
+	#pressed: Prop<boolean>;
+	#disabled: Prop<boolean>;
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
@@ -19,12 +19,10 @@ export class Toggle {
 	}
 
 	get pressed() {
-		console.log("get pressed");
 		return this.#pressed.get();
 	}
 
 	set pressed(value: boolean) {
-		console.log("set pressed", value);
 		this.#pressed.set(value);
 	}
 

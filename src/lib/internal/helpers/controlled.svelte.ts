@@ -20,14 +20,15 @@ export function isControlledProp<T>(value: SyncableProp<T>): value is Controlled
 export type SyncableProp<T> = T | ControlledProp<T>;
 
 export class Prop<T> {
-	#prop: SyncableProp<T>;
+	#prop = $state() as SyncableProp<T>;
 
 	constructor(prop: SyncableProp<T>) {
 		this.#prop = prop;
 	}
 
 	get(): T {
-		return isControlledProp(this.#prop) ? this.#prop.get() : this.#prop;
+		const prop = this.#prop;
+		return isControlledProp(prop) ? prop.get() : prop;
 	}
 
 	set(value: T): void {
