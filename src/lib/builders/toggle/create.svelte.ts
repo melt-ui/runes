@@ -1,25 +1,41 @@
-import { element, disabledAttr, identity, kbd } from "$lib/internal/helpers";
-import type { ChangeFn } from "$lib/internal/types";
+import { disabledAttr, element, kbd } from "$lib/internal/helpers";
+import { isControlledProp, type SyncableProp } from "$lib/internal/types";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
-	#pressed: boolean = $state(false);
-	readonly #onPressedChange: ChangeFn<boolean>;
-	disabled: boolean = $state(false);
+	#pressed: SyncableProp<boolean> = $state(false);
+	#disabled: SyncableProp<boolean> = $state(false);
 
 	constructor(props: ToggleProps = {}) {
-		const { pressed = false, onPressedChange = identity, disabled = false } = props;
+		const { pressed = false, disabled = false } = props;
 		this.#pressed = pressed;
-		this.#onPressedChange = onPressedChange;
-		this.disabled = disabled;
+		this.#disabled = disabled;
 	}
 
 	get pressed() {
-		return this.#pressed;
+		console.log("get pressed");
+		return isControlledProp(this.#pressed) ? this.#pressed.get() : this.#pressed;
 	}
 
 	set pressed(value: boolean) {
-		this.#pressed = this.#onPressedChange(value);
+		console.log("set pressed", value);
+		if (isControlledProp(this.#pressed)) {
+			this.#pressed.set(value);
+		} else {
+			this.#pressed = value;
+		}
+	}
+
+	get disabled() {
+		return isControlledProp(this.#disabled) ? this.#disabled.get() : this.#disabled;
+	}
+
+	set disabled(value: boolean) {
+		if (isControlledProp(this.#disabled)) {
+			this.#disabled.set(value);
+		} else {
+			this.#disabled = value;
+		}
 	}
 
 	readonly root = this.#createRoot();
@@ -43,7 +59,9 @@ export class Toggle {
 				},
 				onclick() {
 					if (self.disabled) return;
+					console.log("onclick b4", self.pressed);
 					self.pressed = !self.pressed;
+					console.log("onclick after", self.pressed);
 				},
 				onkeydown(e: KeyboardEvent) {
 					if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
@@ -63,22 +81,29 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	let _pressed = $state(props.pressed ?? false);
-	let _disabled = $state(props.disabled ?? false);
-	const onPressedChange = props.onPressedChange ?? identity;
+	let _pressed = $state<SyncableProp<boolean>>(props.pressed ?? false);
+	let _disabled = $state<SyncableProp<boolean>>(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
-			return _pressed;
+			return isControlledProp(_pressed) ? _pressed.get() : _pressed;
 		},
 		set pressed(value: boolean) {
-			_pressed = onPressedChange(value);
+			if (isControlledProp(_pressed)) {
+				_pressed.set(value);
+			} else {
+				_pressed = value;
+			}
 		},
 		get disabled() {
-			return _disabled;
+			return isControlledProp(_disabled) ? _disabled.get() : _disabled;
 		},
 		set disabled(value: boolean) {
-			_disabled = value;
+			if (isControlledProp(_disabled)) {
+				_disabled.set(value);
+			} else {
+				_disabled = value;
+			}
 		},
 	}
 

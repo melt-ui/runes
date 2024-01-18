@@ -30,14 +30,14 @@ export type Prettify<T> = { [K in keyof T]: T[K] } & {};
 
 export type Expand<T> = T extends object
 	? T extends infer O
-		? { [K in keyof O]: O[K] }
-		: never
+	? { [K in keyof O]: O[K] }
+	: never
 	: T;
 
 export type ExpandDeep<T> = T extends object
 	? T extends infer O
-		? { [K in keyof O]: ExpandDeep<O[K]> }
-		: never
+	? { [K in keyof O]: ExpandDeep<O[K]> }
+	: never
 	: T;
 
 type Without<T, U> = { [P in Exclude<keyof T, keyof U>]?: never };
@@ -50,15 +50,22 @@ export type WhenTrue<TrueOrFalse, IfTrue, IfFalse, IfNeither = IfTrue | IfFalse>
 ] extends [true]
 	? IfTrue
 	: [TrueOrFalse] extends [false]
-		? IfFalse
-		: IfNeither;
+	? IfFalse
+	: IfNeither;
 
 export type RenameProperties<T, NewNames extends Partial<Record<keyof T, string>>> = Expand<{
 	[K in keyof T as K extends keyof NewNames
-		? NewNames[K] extends PropertyKey
-			? NewNames[K]
-			: K
-		: K]: T[K];
+	? NewNames[K] extends PropertyKey
+	? NewNames[K]
+	: K
+	: K]: T[K];
 }>;
 
 export type NonEmptyArray<T> = [T, ...T[]];
+
+
+export type ControlledProp<T> = { get: () => T; set: (value: T) => void };
+export type SyncableProp<T> = T | ControlledProp<T>;
+export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
+	return typeof value === "object" && value !== null && ("get" in value || "set" in value);
+}

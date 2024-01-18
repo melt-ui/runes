@@ -1,22 +1,25 @@
 <script lang="ts">
 	import { Toggle, createToggle } from "$lib";
 
+	let pressed = $state(false);
+
 	const toggle = new Toggle({
-		onPressedChange: (pressed) => {
-			console.log("onPressedChange", pressed);
-			return pressed;
+		pressed: {
+			get() {
+				return pressed;
+			},
+			set(value) {
+				pressed = value;
+			},
 		},
 	});
 
 	$inspect(toggle.pressed, toggle.disabled);
 
-	const toggle2 = createToggle({
-		onPressedChange: (pressed) => {
-			console.log("onPressedChange", pressed);
-			return pressed;
-		},
-	});
+	const toggle2 = createToggle();
 </script>
+
+<p>Local pressed: {pressed}</p>
 
 <div class="flex gap-24">
 	<button {...toggle.root} class="btn">

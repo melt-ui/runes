@@ -1,7 +1,6 @@
-import type { ChangeFn } from "$lib/internal/types";
+import type { SyncableProp } from "$lib/internal/types";
 
 export type ToggleProps = {
-	pressed?: boolean;
-	onPressedChange?: ChangeFn<boolean>;
-	disabled?: boolean;
+	pressed?: SyncableProp<boolean>;
+	disabled?: SyncableProp<boolean>;
 };
