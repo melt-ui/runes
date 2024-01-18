@@ -13,16 +13,16 @@ export function controlled<T>(args: ControlledArgs<T>): ControlledProp<T> {
 	return Object.assign(args, { [MELT_CONTROLLED_SYMBOL]: true } as const);
 }
 
-export type ControllableProp<T> = T | ControlledProp<T>;
+export type SyncableProp<T> = T | ControlledProp<T>;
 
-export function isControlledProp<T>(value: ControllableProp<T>): value is ControlledProp<T> {
+export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
 	return typeof value === "object" && value !== null && MELT_CONTROLLED_SYMBOL in value;
 }
 
 export class Syncable<T> {
-	#prop = $state() as ControllableProp<T>;
+	#prop = $state() as SyncableProp<T>;
 
-	constructor(prop: ControllableProp<T>) {
+	constructor(prop: SyncableProp<T>) {
 		this.#prop = prop;
 	}
 
