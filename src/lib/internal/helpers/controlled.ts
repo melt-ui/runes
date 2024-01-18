@@ -10,8 +10,7 @@ export type ControlledProp<T> = ControlledArgs<T> & {
 };
 
 export function controlled<T>(value: ControlledArgs<T>): ControlledProp<T> {
-	Object.defineProperty(value, MELT_CONTROLLED_SYMBOL, true);
-	return value as ControlledProp<T>;
+	return Object.assign(value, { [MELT_CONTROLLED_SYMBOL]: true } as const);
 }
 
 export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
