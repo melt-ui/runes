@@ -93,7 +93,6 @@ export class Tooltip {
 		return !this.open && !this.forceVisible;
 	}
 
-
 	// Helpers
 	#clearOpenTimeout() {
 		if (this.#openTimeout) {
@@ -113,7 +112,6 @@ export class Tooltip {
 		if (!isBrowser) return null;
 		return document.getElementById(this.ids[part]);
 	}
-
 
 	#openTooltip(reason: OpenReason) {
 		this.#clearCloseTimeout();

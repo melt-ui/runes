@@ -1,11 +1,12 @@
 export * from "./attr";
 export * from "./element";
 export * from "./callbacks";
+export * from "./controlled";
 export * from "./portal";
 export * from "./event";
 export * from "./id";
 export * from "./is";
 export * from "./keyboard";
-export * from "./lifecycle.svelte"; 1
+export * from "./lifecycle.svelte";
 export * from "./polygon";
 export * from "./style";
