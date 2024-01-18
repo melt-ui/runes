@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Toggle, melt } from "$lib";
+	import { Toggle } from "$lib";
 
 	const toggle = new Toggle({
 		onPressedChange: (pressed) => {
@@ -12,7 +12,7 @@
 </script>
 
 <div class="flex gap-24">
-	<button use:melt={toggle.root} class="btn">
+	<button {...toggle.root} class="btn">
 		{#if toggle.pressed}
 			On
 		{:else}
