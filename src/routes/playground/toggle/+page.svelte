@@ -48,8 +48,8 @@
 		</button>
 
 		<div class="flex items-center gap-2">
-			<label for="disabled" class="select-none">Disabled</label>
-			<input id="disabled" type="checkbox" bind:checked={toggle2.disabled} />
+			<label for="disabled-2" class="select-none">Disabled</label>
+			<input id="disabled-2" type="checkbox" bind:checked={toggle2.disabled} />
 		</div>
 	</div>
 </div>
