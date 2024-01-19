@@ -158,35 +158,33 @@ export class Tooltip {
 	#createTrigger() {
 		const self = this;
 		return element("tooltip-trigger", {
-			props: {
-				get "aria-describedby"() {
-					return self.ids.content;
-				},
-				get id() {
-					return self.ids.trigger;
-				},
-				onpointerdown() {
-					if (!self.closeOnPointerDown) return;
-					self.open = false;
-					self.#clickedTrigger = true;
-				},
-				onpointerenter(e: PointerEvent) {
-					if (isTouch(e)) return;
-					self.#openTooltip("pointer");
-				},
-				onpointerleave(e: PointerEvent) {
-					if (isTouch(e)) return;
-					self.#clearOpenTimeout();
-				},
-				onfocus() {
-					if (self.#clickedTrigger) return;
-					self.#openTooltip("focus");
-				},
-				onblur() {
-					self.#closeTooltip(true);
-				},
-				onkeydown: self.#handleKeyDown.bind(self),
+			get "aria-describedby"() {
+				return self.ids.content;
 			},
+			get id() {
+				return self.ids.trigger;
+			},
+			onpointerdown() {
+				if (!self.closeOnPointerDown) return;
+				self.open = false;
+				self.#clickedTrigger = true;
+			},
+			onpointerenter(e: PointerEvent) {
+				if (isTouch(e)) return;
+				self.#openTooltip("pointer");
+			},
+			onpointerleave(e: PointerEvent) {
+				if (isTouch(e)) return;
+				self.#clearOpenTimeout();
+			},
+			onfocus() {
+				if (self.#clickedTrigger) return;
+				self.#openTooltip("focus");
+			},
+			onblur() {
+				self.#closeTooltip(true);
+			},
+			onkeydown: self.#handleKeyDown.bind(self),
 		});
 	}
 
@@ -195,27 +193,25 @@ export class Tooltip {
 	#createContent() {
 		const self = this;
 		return element("tooltip-content", {
-			props: {
-				role: "tooltip",
-				tabindex: -1,
-				get hidden() {
-					return self.#hidden ? true : undefined;
-				},
-				get style() {
-					return self.#hidden ? "display: none;" : undefined;
-				},
-				get id() {
-					return self.ids.content;
-				},
-				get "data-portal"() {
-					return self.portal ? "" : undefined;
-				},
-				onpointerenter() {
-					self.#openTooltip("pointer");
-				},
-				onpointerdown() {
-					self.#openTooltip("pointer");
-				},
+			role: "tooltip",
+			tabindex: -1,
+			get hidden() {
+				return self.#hidden ? true : undefined;
+			},
+			get style() {
+				return self.#hidden ? "display: none;" : undefined;
+			},
+			get id() {
+				return self.ids.content;
+			},
+			get "data-portal"() {
+				return self.portal ? "" : undefined;
+			},
+			onpointerenter() {
+				self.#openTooltip("pointer");
+			},
+			onpointerdown() {
+				self.#openTooltip("pointer");
 			},
 		});
 	}
@@ -225,16 +221,14 @@ export class Tooltip {
 	#createArrow() {
 		const self = this;
 		return element("tooltip-arrow", {
-			props: {
-				"data-arrow": true,
-				get style() {
-					const size = `var(--arrow-size, ${self.arrowSize}px)`;
-					return styleToString({
-						position: "absolute",
-						width: size,
-						height: size,
-					});
-				},
+			"data-arrow": true,
+			get style() {
+				const size = `var(--arrow-size, ${self.arrowSize}px)`;
+				return styleToString({
+					position: "absolute",
+					width: size,
+					height: size,
+				});
 			},
 		});
 	}

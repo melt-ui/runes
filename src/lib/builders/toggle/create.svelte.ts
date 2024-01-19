@@ -1,4 +1,4 @@
-import { Syncable, disabledAttr, element, isControlledProp, kbd } from "$lib/internal/helpers";
+import { Syncable, disabledAttr, element, kbd } from "$lib/internal/helpers";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
@@ -32,31 +32,29 @@ export class Toggle {
 	#createRoot() {
 		const self = this;
 		return element("toggle", {
-			props: {
-				type: "button",
-				get disabled() {
-					return disabledAttr(self.disabled);
-				},
-				get "data-disabled"() {
-					return disabledAttr(self.disabled);
-				},
-				get "data-state"() {
-					return self.pressed ? "on" : "off";
-				},
-				get "aria-pressed"() {
-					return self.pressed;
-				},
-				onclick() {
-					if (self.disabled) return;
-					console.log("onclick b4", self.pressed);
-					self.pressed = !self.pressed;
-					console.log("onclick after", self.pressed);
-				},
-				onkeydown(e: KeyboardEvent) {
-					if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
-					e.preventDefault();
-					this.onclick();
-				},
+			type: "button",
+			get disabled() {
+				return disabledAttr(self.disabled);
+			},
+			get "data-disabled"() {
+				return disabledAttr(self.disabled);
+			},
+			get "data-state"() {
+				return self.pressed ? "on" : "off";
+			},
+			get "aria-pressed"() {
+				return self.pressed;
+			},
+			onclick() {
+				if (self.disabled) return;
+				console.log("onclick b4", self.pressed);
+				self.pressed = !self.pressed;
+				console.log("onclick after", self.pressed);
+			},
+			onkeydown(e: KeyboardEvent) {
+				if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
+				e.preventDefault();
+				this.onclick();
 			},
 		});
 	}
@@ -70,55 +68,45 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	let _pressed = $state(props.pressed ?? false);
-	let _disabled = $state(props.disabled ?? false);
+	const _pressed = new Syncable(props.pressed ?? false);
+	const _disabled = new Syncable(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
-			return isControlledProp(_pressed) ? _pressed.get() : _pressed;
+			return _pressed.get();
 		},
 		set pressed(value: boolean) {
-			if (isControlledProp(_pressed)) {
-				_pressed.set(value);
-			} else {
-				_pressed = value;
-			}
+			_pressed.set(value);
 		},
 		get disabled() {
-			return isControlledProp(_disabled) ? _disabled.get() : _disabled;
+			return _disabled.get();
 		},
 		set disabled(value: boolean) {
-			if (isControlledProp(_disabled)) {
-				_disabled.set(value);
-			} else {
-				_disabled = value;
-			}
+			_disabled.set(value);
 		},
 	};
 
 	const root = element("toggle", {
-		props: {
-			get disabled() {
-				return disabledAttr(states.disabled);
-			},
-			get "data-disabled"() {
-				return disabledAttr(states.disabled);
-			},
-			get "data-state"() {
-				return states.pressed ? "on" : "off";
-			},
-			get "aria-pressed"() {
-				return states.pressed;
-			},
-			onclick() {
-				if (states.disabled) return;
-				states.pressed = !states.pressed;
-			},
-			onkeydown(e: KeyboardEvent) {
-				if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
-				e.preventDefault();
-				this.onclick();
-			},
+		get disabled() {
+			return disabledAttr(states.disabled);
+		},
+		get "data-disabled"() {
+			return disabledAttr(states.disabled);
+		},
+		get "data-state"() {
+			return states.pressed ? "on" : "off";
+		},
+		get "aria-pressed"() {
+			return states.pressed;
+		},
+		onclick() {
+			if (states.disabled) return;
+			states.pressed = !states.pressed;
+		},
+		onkeydown(e: KeyboardEvent) {
+			if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
+			e.preventDefault();
+			this.onclick();
 		},
 	});
 
