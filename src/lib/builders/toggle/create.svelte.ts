@@ -12,19 +12,19 @@ export class Toggle {
 	}
 
 	get pressed() {
-		return this.#pressed.get();
+		return this.#pressed.value;
 	}
 
 	set pressed(value: boolean) {
-		this.#pressed.set(value);
+		this.#pressed.value = value;
 	}
 
 	get disabled() {
-		return this.#disabled.get();
+		return this.#disabled.value;
 	}
 
 	set disabled(value: boolean) {
-		this.#disabled.set(value);
+		this.#disabled.value = value;
 	}
 
 	readonly root = this.#createRoot();
@@ -47,9 +47,7 @@ export class Toggle {
 			},
 			onclick() {
 				if (self.disabled) return;
-				console.log("onclick b4", self.pressed);
 				self.pressed = !self.pressed;
-				console.log("onclick after", self.pressed);
 			},
 			onkeydown(e: KeyboardEvent) {
 				if (e.key !== kbd.ENTER && e.key !== kbd.SPACE) return;
@@ -73,16 +71,16 @@ export function createToggle(props: ToggleProps = {}) {
 
 	const states = {
 		get pressed() {
-			return _pressed.get();
+			return _pressed.value;
 		},
 		set pressed(value: boolean) {
-			_pressed.set(value);
+			_pressed.value = value;
 		},
 		get disabled() {
-			return _disabled.get();
+			return _disabled.value;
 		},
 		set disabled(value: boolean) {
-			_disabled.set(value);
+			_disabled.value = value;
 		},
 	};
 

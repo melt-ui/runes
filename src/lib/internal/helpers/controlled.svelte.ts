@@ -1,24 +1,63 @@
-const MELT_CONTROLLED_SYMBOL = Symbol("MELT_CONTROLLED_SYMBOL");
-
-export type ControlledArgs<T> = {
-	get: () => T;
-	set: (value: T) => void;
-};
-
-export type ControlledProp<T> = ControlledArgs<T> & {
-	[MELT_CONTROLLED_SYMBOL]: true;
-};
-
-export function controlled<T>(args: ControlledArgs<T>): ControlledProp<T> {
-	return Object.assign(args, { [MELT_CONTROLLED_SYMBOL]: true } as const);
+// Ideally, this would be an interface, but abstract classes
+// allow for `instaceof` runtime checking.
+abstract class State<T> {
+	abstract value: T;
 }
 
-export type SyncableProp<T> = T | ControlledProp<T>;
+// A wrapper around `$state` with reference semantics.
+// This is the runes equivalent to "pass your own store".
+export class ControlledState<T> extends State<T> {
+	#value = $state() as T;
 
-export function isControlledProp<T>(value: SyncableProp<T>): value is ControlledProp<T> {
-	return typeof value === "object" && value !== null && MELT_CONTROLLED_SYMBOL in value;
+	constructor(initialValue: T) {
+		super();
+		this.#value = initialValue;
+	}
+
+	get value(): T {
+		return this.#value;
+	}
+
+	set value(value: T) {
+		this.#value = value;
+	}
 }
 
+export type RefArgs<T> = {
+	get(): T;
+	set(value: T): void;
+};
+
+// I called this `Ref` because it *references* external state, but
+// it could be confusing for devs coming from a Vue background.
+//
+// TODO: come up with a better name
+export class Ref<T> extends State<T> {
+	#get: () => T;
+	#set: (value: T) => void;
+
+	constructor(args: RefArgs<T>) {
+		super();
+		this.#get = args.get.bind(args);
+		this.#set = args.set.bind(args);
+	}
+
+	get value(): T {
+		return this.#get();
+	}
+
+	set value(value: T) {
+		this.#set(value);
+	}
+}
+
+export type SyncableProp<T> = T | ControlledState<T> | Ref<T>;
+
+// A wrapper around `SyncableProp` that manages the difference
+// in implementation for `get` and `set`.
+//
+// If the user passes in `T`, it sets its own state.
+// If they pass in `State<T>`, it calles the `set` method on that state.
 export class Syncable<T> {
 	#prop = $state() as SyncableProp<T>;
 
@@ -26,14 +65,15 @@ export class Syncable<T> {
 		this.#prop = prop;
 	}
 
-	get(): T {
+	get value(): T {
 		const prop = this.#prop;
-		return isControlledProp(prop) ? prop.get() : prop;
+		return prop instanceof State ? prop.value : prop;
 	}
 
-	set(value: T): void {
-		if (isControlledProp(this.#prop)) {
-			this.#prop.set(value);
+	set value(value: T) {
+		const prop = this.#prop;
+		if (prop instanceof State) {
+			prop.value = value;
 		} else {
 			this.#prop = value;
 		}

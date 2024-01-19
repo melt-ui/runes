@@ -1,27 +1,18 @@
 <script lang="ts">
-	import { Toggle, createToggle } from "$lib";
-	import { controlled } from "$lib/internal/helpers";
+	import { Toggle } from "$lib";
+	import { ControlledState } from "$lib/internal/helpers";
+	import ToggleComponent from "./Toggle.svelte";
 
-	let pressed = $state(false);
+	const pressed = new ControlledState(false);
+	const disabled = new ControlledState(false);
 
-	const toggle = new Toggle({
-		pressed: controlled({
-			get() {
-				return pressed;
-			},
-			set(value) {
-				pressed = value;
-			},
-		}),
-	});
+	const toggle = new Toggle({ pressed, disabled });
 
 	$inspect(toggle.pressed, toggle.disabled);
-
-	const toggle2 = createToggle();
 </script>
 
 <div class="space-y-6">
-	<p>Local pressed: {pressed}</p>
+	<p>Local pressed: {pressed.value}</p>
 
 	<div class="flex gap-24">
 		<button {...toggle.root} class="btn">
@@ -34,22 +25,23 @@
 
 		<div class="flex items-center gap-2">
 			<label for="disabled" class="select-none">Disabled</label>
-			<input id="disabled" type="checkbox" bind:checked={toggle.disabled} />
+			<input id="disabled" type="checkbox" bind:checked={disabled.value} />
 		</div>
 	</div>
 
 	<div class="flex gap-24">
-		<button {...toggle2.root} class="btn">
-			{#if toggle2.pressed}
-				On
-			{:else}
+		<ToggleComponent bind:pressed={pressed.value} disabled={disabled.value} class="btn">
+			{#snippet off()}
 				Off
-			{/if}
-		</button>
+			{/snippet}
+			{#snippet on()}
+				On
+			{/snippet}
+		</ToggleComponent>
 
 		<div class="flex items-center gap-2">
 			<label for="disabled-2" class="select-none">Disabled</label>
-			<input id="disabled-2" type="checkbox" bind:checked={toggle2.disabled} />
+			<input id="disabled-2" type="checkbox" bind:checked={disabled.value} />
 		</div>
 	</div>
 </div>
