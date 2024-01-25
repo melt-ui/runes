@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-	import { ControlledState } from "$lib/internal/helpers";
+	import { Ref } from "$lib/internal/helpers";
 	import ToggleComponent from "./Toggle.svelte";
 
-	const pressed = new ControlledState(false);
-	const disabled = new ControlledState(false);
+	const pressed = new Ref(false);
+	const disabled = new Ref(false);
 
 	const toggle = new Toggle({ pressed, disabled });
 

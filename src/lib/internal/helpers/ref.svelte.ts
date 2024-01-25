@@ -1,12 +1,12 @@
 // Ideally, this would be an interface, but abstract classes
 // allow for `instaceof` runtime checking.
-abstract class State<T> {
+abstract class BaseRef<T> {
 	abstract value: T;
 }
 
 // A wrapper around `$state` with reference semantics.
 // This is the runes equivalent to "pass your own store".
-export class ControlledState<T> extends State<T> {
+export class Ref<T> extends BaseRef<T> {
 	#value = $state() as T;
 
 	constructor(initialValue: T) {
@@ -23,7 +23,7 @@ export class ControlledState<T> extends State<T> {
 	}
 }
 
-export type RefArgs<T> = {
+export type DerivedRefArgs<T> = {
 	get(): T;
 	set(value: T): void;
 };
@@ -32,11 +32,11 @@ export type RefArgs<T> = {
 // it could be confusing for devs coming from a Vue background.
 //
 // TODO: come up with a better name
-export class Ref<T> extends State<T> {
+export class DerivedRef<T> extends BaseRef<T> {
 	#get: () => T;
 	#set: (value: T) => void;
 
-	constructor(args: RefArgs<T>) {
+	constructor(args: DerivedRefArgs<T>) {
 		super();
 		this.#get = args.get.bind(args);
 		this.#set = args.set.bind(args);
@@ -51,28 +51,28 @@ export class Ref<T> extends State<T> {
 	}
 }
 
-export type SyncableProp<T> = T | ControlledState<T> | Ref<T>;
+export type RefOr<T> = T | Ref<T> | DerivedRef<T>;
 
-// A wrapper around `SyncableProp` that manages the difference
-// in implementation for `get` and `set`.
+// A wrapper around `RefOr<T>` that manages the
+// difference in implementation for `get` and `set`.
 //
 // If the user passes in `T`, it sets its own state.
-// If they pass in `State<T>`, it calles the `set` method on that state.
-export class Syncable<T> {
-	#prop = $state() as SyncableProp<T>;
+// If they pass in `BaseRef<T>`, it calles the `set` method.
+export class ControllableProp<T> {
+	#prop = $state() as RefOr<T>;
 
-	constructor(prop: SyncableProp<T>) {
+	constructor(prop: RefOr<T>) {
 		this.#prop = prop;
 	}
 
 	get value(): T {
 		const prop = this.#prop;
-		return prop instanceof State ? prop.value : prop;
+		return prop instanceof BaseRef ? prop.value : prop;
 	}
 
 	set value(value: T) {
 		const prop = this.#prop;
-		if (prop instanceof State) {
+		if (prop instanceof BaseRef) {
 			prop.value = value;
 		} else {
 			this.#prop = value;
