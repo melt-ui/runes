@@ -1,5 +1,5 @@
 // Ideally, this would be an interface, but abstract classes
-// allow for `instaceof` runtime checking.
+// allow for `instanceof` runtime checking.
 abstract class BaseRef<T> {
 	abstract value: T;
 }
