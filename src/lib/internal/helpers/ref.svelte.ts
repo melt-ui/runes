@@ -7,19 +7,11 @@ abstract class BaseRef<T> {
 // A wrapper around `$state` with reference semantics.
 // This is the runes equivalent to "pass your own store".
 export class Ref<T> extends BaseRef<T> {
-	#value = $state() as T;
+	value = $state() as T;
 
 	constructor(initialValue: T) {
 		super();
-		this.#value = initialValue;
-	}
-
-	get value(): T {
-		return this.#value;
-	}
-
-	set value(value: T) {
-		this.#value = value;
+		this.value = initialValue;
 	}
 }
 
