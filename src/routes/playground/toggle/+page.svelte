@@ -5,43 +5,50 @@
 
 	const pressed = new Ref(false);
 	const disabled = new Ref(false);
+	const controlled = new Toggle({ pressed, disabled });
 
-	const toggle = new Toggle({ pressed, disabled });
+	$inspect(controlled.pressed, controlled.disabled);
 
-	$inspect(toggle.pressed, toggle.disabled);
+	const uncontrolled = new Toggle();
 </script>
 
-<div class="space-y-6">
-	<p>Local pressed: {pressed.value}</p>
+<div class="space-y-8">
+	<section>
+		<h1>Controlled</h1>
 
-	<div class="flex gap-24">
-		<button {...toggle.root} class="btn">
-			{#if toggle.pressed}
+		<div class="mt-3 flex items-center">
+			<button {...controlled.root} class="btn">
+				{#if pressed.value}
+					On
+				{:else}
+					Off
+				{/if}
+			</button>
+
+			<ToggleComponent bind:pressed={pressed.value} disabled={disabled.value} class="btn ml-4">
+				{#snippet off()}
+					Off
+				{/snippet}
+
+				{#snippet on()}
+					On
+				{/snippet}
+			</ToggleComponent>
+
+			<label for="disabled" class="ml-24 select-none">Disabled</label>
+			<input id="disabled" type="checkbox" bind:checked={disabled.value} class="ml-2" />
+		</div>
+	</section>
+
+	<section>
+		<h1>Uncontrolled</h1>
+
+		<button {...uncontrolled.root} class="btn mt-3 flex">
+			{#if uncontrolled.pressed}
 				On
 			{:else}
 				Off
 			{/if}
 		</button>
-
-		<div class="flex items-center gap-2">
-			<label for="disabled" class="select-none">Disabled</label>
-			<input id="disabled" type="checkbox" bind:checked={disabled.value} />
-		</div>
-	</div>
-
-	<div class="flex gap-24">
-		<ToggleComponent bind:pressed={pressed.value} disabled={disabled.value} class="btn">
-			{#snippet off()}
-				Off
-			{/snippet}
-			{#snippet on()}
-				On
-			{/snippet}
-		</ToggleComponent>
-
-		<div class="flex items-center gap-2">
-			<label for="disabled-2" class="select-none">Disabled</label>
-			<input id="disabled-2" type="checkbox" bind:checked={disabled.value} />
-		</div>
-	</div>
+	</section>
 </div>
