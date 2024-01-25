@@ -20,10 +20,6 @@ export type DerivedRefArgs<T> = {
 	set(value: T): void;
 };
 
-// I called this `Ref` because it *references* external state, but
-// it could be confusing for devs coming from a Vue background.
-//
-// TODO: come up with a better name
 export class DerivedRef<T> extends BaseRef<T> {
 	#get: () => T;
 	#set: (value: T) => void;
