@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-	import { Derived, MutableDerived } from "$lib/internal/helpers";
+
+	import { box } from "$lib/internal/helpers/box.svelte";
 	import type { Snippet } from "svelte";
 	import type { HTMLButtonAttributes } from "svelte/elements";
 
@@ -13,15 +14,11 @@
 	let { pressed, disabled, class: className = "", off, on, ...props } = $props<Props>();
 
 	const toggle = new Toggle({
-		pressed: new MutableDerived({
-			get() {
-				return pressed;
-			},
-			set(value) {
-				pressed = value;
-			},
-		}),
-		disabled: new Derived(() => disabled ?? false),
+		pressed: box(
+			() => pressed,
+			(v) => (pressed = v),
+		),
+		disabled: box(() => disabled ?? false),
 	});
 </script>
 

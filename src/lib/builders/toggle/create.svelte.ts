@@ -1,26 +1,36 @@
 import { MutableRef, Ref, disabledAttr, element, kbd } from "$lib/internal/helpers";
+import { box, type Box, type BoxFrom, type BoxOr, type Read, type Write } from "$lib/internal/helpers/box.svelte";
 import type { ToggleProps } from "./types";
 
+const defaults = {
+	pressed: false as boolean,
+	disabled: false as boolean,
+} satisfies ToggleProps;
+
+const mergeProps = (props: ToggleProps) => ({ ...defaults, ...props });
+
+type MergedProps = ReturnType<typeof mergeProps>
+
 export class Toggle {
-	#pressed: MutableRef<boolean>;
-	#disabled: Ref<boolean>;
+	#pressed: BoxFrom<MergedProps["pressed"]>;
+	#disabled: BoxFrom<MergedProps["disabled"]>;
 
 	constructor(props: ToggleProps = {}) {
-		const { pressed = false, disabled = false } = props;
-		this.#pressed = MutableRef.from(pressed);
-		this.#disabled = Ref.from(disabled);
+		const { pressed, disabled } = mergeProps(props) as { pressed: BoxOr<Write<boolean>>, disabled: BoxOr<Read<boolean>> }
+		this.#pressed = box.from(pressed);
+		this.#disabled = box.from(disabled);
 	}
 
 	get pressed() {
-		return this.#pressed.value;
+		return this.#pressed.get()
 	}
 
 	set pressed(value: boolean) {
-		this.#pressed.value = value;
+		this.#pressed.set(value)
 	}
 
 	get disabled() {
-		return this.#disabled.value;
+		return this.#disabled.get()
 	}
 
 	readonly root = this.#createRoot();
@@ -62,18 +72,18 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	const _pressed = MutableRef.from(props.pressed ?? false);
-	const _disabled = Ref.from(props.disabled ?? false);
+	const _pressed = box.from(props.pressed ?? false);
+	const _disabled = box.from(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
-			return _pressed.value;
+			return _pressed.get();
 		},
 		set pressed(value: boolean) {
-			_pressed.value = value;
+			_pressed.set(value)
 		},
 		get disabled() {
-			return _disabled.value;
+			return _disabled.get();
 		},
 	};
 
