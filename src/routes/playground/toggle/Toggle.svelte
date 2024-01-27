@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { createToggle } from "$lib";
-	import { DerivedRef } from "$lib/internal/helpers";
+	import { derivedRef } from "$lib/internal/helpers";
 	import type { Snippet } from "svelte";
 	import type { HTMLButtonAttributes } from "svelte/elements";
 
@@ -13,7 +13,7 @@
 	let { pressed, disabled, off, on, ...props } = $props<Props>();
 
 	const toggle = createToggle({
-		pressed: new DerivedRef({
+		pressed: derivedRef({
 			get() {
 				return pressed;
 			},
@@ -21,14 +21,7 @@
 				pressed = value;
 			},
 		}),
-		disabled: new DerivedRef({
-			get() {
-				return disabled ?? false;
-			},
-			set(value) {
-				disabled = value;
-			},
-		}),
+		disabled: derivedRef(() => disabled ?? false),
 	});
 </script>
 

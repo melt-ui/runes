@@ -1,10 +1,10 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-	import { Ref } from "$lib/internal/helpers";
+	import { ref } from "$lib/internal/helpers";
 	import ToggleComponent from "./Toggle.svelte";
 
-	const pressed = new Ref(false);
-	const disabled = new Ref(false);
+	const pressed = ref(false);
+	const disabled = ref(false);
 	const controlled = new Toggle({ pressed, disabled });
 
 	$inspect(controlled.pressed, controlled.disabled);

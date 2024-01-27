@@ -1,14 +1,22 @@
-import { disabledAttr, element, kbd, ref, type SomeRef } from "$lib/internal/helpers";
+import {
+	ReadableRef,
+	WritableRef,
+	disabledAttr,
+	element,
+	kbd,
+	toReadableRef,
+	toWritableRef,
+} from "$lib/internal/helpers";
 import type { ToggleProps } from "./types";
 
 export class Toggle {
-	#pressed: SomeRef<boolean>;
-	#disabled: SomeRef<boolean>;
+	#pressed: WritableRef<boolean>;
+	#disabled: ReadableRef<boolean>;
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
-		this.#pressed = ref(pressed);
-		this.#disabled = ref(disabled);
+		this.#pressed = toWritableRef(pressed);
+		this.#disabled = toReadableRef(disabled);
 	}
 
 	get pressed() {
@@ -21,10 +29,6 @@ export class Toggle {
 
 	get disabled() {
 		return this.#disabled.value;
-	}
-
-	set disabled(value: boolean) {
-		this.#disabled.value = value;
 	}
 
 	readonly root = this.#createRoot();
@@ -66,8 +70,8 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	const _pressed = ref(props.pressed ?? false);
-	const _disabled = ref(props.disabled ?? false);
+	const _pressed = toWritableRef(props.pressed ?? false);
+	const _disabled = toReadableRef(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
@@ -78,9 +82,6 @@ export function createToggle(props: ToggleProps = {}) {
 		},
 		get disabled() {
 			return _disabled.value;
-		},
-		set disabled(value: boolean) {
-			_disabled.value = value;
 		},
 	};
 

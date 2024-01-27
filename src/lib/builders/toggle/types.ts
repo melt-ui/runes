@@ -1,6 +1,6 @@
-import type { RefOr } from "$lib/internal/helpers";
+import type { ReadableProp, WritableProp } from "$lib/internal/helpers";
 
 export type ToggleProps = {
-	pressed?: RefOr<boolean>;
-	disabled?: RefOr<boolean>;
+	pressed?: WritableProp<boolean>;
+	disabled?: ReadableProp<boolean>;
 };
