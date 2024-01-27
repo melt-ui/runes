@@ -1,25 +1,31 @@
 import type { FloatingConfig } from "$lib/internal/actions";
-import type { IdObj } from "$lib/internal/helpers";
-import type { ChangeFn } from "$lib/internal/types";
+import type { MutableRefOr, RefOr } from "$lib/internal/helpers";
 
 export type TooltipProps = {
-	positioning?: FloatingConfig;
-	arrowSize?: number;
-	open?: boolean;
-	onOpenChange?: ChangeFn<boolean>;
-	closeOnPointerDown?: boolean;
-	openDelay?: number;
-	closeDelay?: number;
-	forceVisible?: boolean;
-	closeOnEscape?: boolean;
-	disableHoverableContent?: boolean;
+	open?: MutableRefOr<boolean>;
+
+	positioning?: RefOr<FloatingConfig>;
+
+	arrowSize?: RefOr<number>;
+
+	openDelay?: RefOr<number>;
+
+	closeDelay?: RefOr<number>;
+
+	closeOnPointerDown?: RefOr<boolean>;
+
+	closeOnEscape?: RefOr<boolean>;
+
+	forceVisible?: RefOr<boolean>;
+
+	disableHoverableContent?: RefOr<boolean>;
 
 	/**
 	 * If set to `true`, whenever you open this tooltip, all other tooltips
 	 * with `group` also set to `true` will close. If you pass in a string
 	 * instead, only tooltips with the same `group` value will be closed.
 	 */
-	group?: boolean | string;
+	group?: RefOr<boolean | string | undefined>;
 
 	/**
 	 *
@@ -27,12 +33,15 @@ export type TooltipProps = {
 	 *
 	 * @default 'body'
 	 */
-	portal?: HTMLElement | string | null;
+	portal?: RefOr<HTMLElement | string | null>;
 
 	/**
-	 * Optionally override the default ids we assign to the elements
+	 * Optionally override the default ids we assign to the trigger element.
 	 */
-	ids?: Partial<IdObj<TooltipIdParts>>;
-};
+	triggerId?: RefOr<string>;
 
-export type TooltipIdParts = "trigger" | "content";
+	/**
+	 * Optionally override the default ids we assign to the content element.
+	 */
+	contentId?: RefOr<string>;
+};

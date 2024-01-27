@@ -1,20 +1,44 @@
-export abstract class ReadableRef<T> {
-	abstract get value(): T;
+export type RefOr<T> = T | Ref<T>;
+
+export abstract class Ref<T> {
+	abstract readonly value: T;
 
 	get(): T {
 		return this.value;
 	}
+
+	static from<T>(value: RefOr<T>): Ref<T> {
+		if (value instanceof Ref) {
+			return value;
+		}
+		return new ConstRef(value);
+	}
 }
 
-export abstract class WritableRef<T> extends ReadableRef<T> {
-	abstract set value(value: T);
+export class ConstRef<T> extends Ref<T> {
+	constructor(readonly value: T) {
+		super();
+	}
+}
+
+export type MutableRefOr<T> = T | MutableRef<T>;
+
+export abstract class MutableRef<T> extends Ref<T> {
+	abstract value: T;
 
 	set(value: T): void {
 		this.value = value;
 	}
+
+	static from<T>(value: MutableRefOr<T>): MutableRef<T> {
+		if (value instanceof Ref) {
+			return value;
+		}
+		return new State(value);
+	}
 }
 
-class StateRef<T> extends WritableRef<T> {
+export class State<T> extends MutableRef<T> {
 	value = $state() as T;
 
 	constructor(initialValue: T) {
@@ -23,82 +47,36 @@ class StateRef<T> extends WritableRef<T> {
 	}
 }
 
-export function ref<T>(initialValue: T): WritableRef<T> {
-	return new StateRef(initialValue);
-}
-
-export type Getter<T> = () => T;
-export type Setter<T> = (value: T) => void;
-
-/**
- * Readonly wrapper around external state.
- */
-class DerivedReadableRef<T> extends ReadableRef<T> {
-	constructor(readonly get: Getter<T>) {
+export class Derived<T> extends Ref<T> {
+	constructor(readonly get: () => T) {
 		super();
 	}
 
-	get value() {
+	get value(): T {
 		return this.get();
 	}
 }
 
-/**
- * Writable wrapper around external state.
- */
-class DerivedWritableRef<T> extends WritableRef<T> {
-	constructor(
-		readonly get: Getter<T>,
-		readonly set: Setter<T>,
-	) {
+export type MutableDerivedArgs<T> = {
+	get: () => T;
+	set: (value: T) => void;
+};
+
+export class MutableDerived<T> extends MutableRef<T> {
+	readonly get: () => T;
+	readonly set: (value: T) => void;
+
+	constructor(readonly args: MutableDerivedArgs<T>) {
 		super();
+		this.get = args.get.bind(args);
+		this.set = args.set.bind(args);
 	}
 
-	get value() {
-		return this.get();
+	get value(): T {
+		return this.args.get();
 	}
 
 	set value(value: T) {
-		this.set(value);
+		this.args.set(value);
 	}
-}
-
-export type GetSet<T> = {
-	get: Getter<T>;
-	set: Setter<T>;
-};
-
-export function derivedRef<T>(getter: Getter<T>): ReadableRef<T>;
-
-export function derivedRef<T>(args: GetSet<T>): WritableRef<T>;
-
-export function derivedRef<T>(args: Getter<T> | GetSet<T>): ReadableRef<T> {
-	if (typeof args === "function") {
-		return new DerivedReadableRef(args);
-	}
-	return new DerivedWritableRef(args.get.bind(args), args.set.bind(args));
-}
-
-export type ReadableProp<T> = T | ReadableRef<T>;
-
-export function toReadableRef<T>(value: ReadableProp<T>): ReadableRef<T> {
-	if (value instanceof ReadableRef) {
-		return value;
-	}
-	return new ConstRef(value);
-}
-
-class ConstRef<T> extends ReadableRef<T> {
-	constructor(readonly value: T) {
-		super();
-	}
-}
-
-export type WritableProp<T> = T | WritableRef<T>;
-
-export function toWritableRef<T>(value: WritableProp<T>): WritableRef<T> {
-	if (value instanceof WritableRef) {
-		return value;
-	}
-	return new StateRef(value);
 }

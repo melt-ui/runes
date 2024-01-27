@@ -1,22 +1,20 @@
 import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
 import {
+	MutableRef,
+	Ref,
 	addEventListener,
 	autodisposable,
 	element,
 	generateId,
 	getPortalDestination,
-	identity,
-	isBrowser,
 	isTouch,
 	kbd,
 	makeHullFromElements,
 	noop,
 	pointInPolygon,
 	styleToString,
-	type IdObj,
 } from "$lib/internal/helpers";
-import type { ChangeFn } from "$lib/internal/types.js";
-import type { TooltipIdParts, TooltipProps } from "./types.js";
+import type { TooltipProps } from "./types.js";
 
 // Store a global map to get the currently open tooltip in a given group.
 const openTooltips = new Map<string | true, Tooltip>();
@@ -24,52 +22,50 @@ const openTooltips = new Map<string | true, Tooltip>();
 type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
-	positioning: FloatingConfig = $state(null);
-	arrowSize: number = $state(0);
-	closeOnPointerDown: boolean = $state(false);
-	openDelay: number = $state(0);
-	closeDelay: number = $state(0);
-	forceVisible: boolean = $state(false);
-	closeOnEscape: boolean = $state(false);
-	disableHoverableContent: boolean = $state(false);
-	group: string | boolean | undefined = $state();
-	portal: HTMLElement | string | null = $state(null);
-	ids: IdObj<TooltipIdParts> = $state({ content: "", trigger: "" });
-
-	#open: boolean = $state(false);
-	readonly #onOpenChange: ChangeFn<boolean>;
+	#open: MutableRef<boolean>;
+	#positioning: Ref<FloatingConfig>;
+	#arrowSize: Ref<number>;
+	#openDelay: Ref<number>;
+	#closeDelay: Ref<number>;
+	#closeOnPointerDown: Ref<boolean>;
+	#closeOnEscape: Ref<boolean>;
+	#forceVisible: Ref<boolean>;
+	#disableHoverableContent: Ref<boolean>;
+	#group: Ref<string | boolean | undefined>;
+	#portal: Ref<HTMLElement | string | null>;
+	#triggerId: Ref<string>;
+	#contentId: Ref<string>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
+			open = false,
 			positioning = { placement: "bottom" },
 			arrowSize = 8,
-			open = false,
-			onOpenChange = identity,
-			closeOnPointerDown = true,
 			openDelay = 1000,
 			closeDelay = 0,
-			forceVisible = false,
-			portal = "body",
+			closeOnPointerDown = true,
 			closeOnEscape = true,
+			forceVisible = false,
 			disableHoverableContent = false,
 			group,
-			ids,
+			portal = "body",
+			triggerId = generateId(),
+			contentId = generateId(),
 		} = props;
 
-		this.positioning = positioning;
-		this.arrowSize = arrowSize;
-		this.#open = open;
-		this.#onOpenChange = onOpenChange;
-		this.closeOnPointerDown = closeOnPointerDown;
-		this.openDelay = openDelay;
-		this.closeDelay = closeDelay;
-		this.forceVisible = forceVisible;
-		this.portal = portal;
-		this.closeOnEscape = closeOnEscape;
-		this.disableHoverableContent = disableHoverableContent;
-		this.group = group;
-		this.ids.content = ids?.content ?? generateId();
-		this.ids.trigger = ids?.trigger ?? generateId();
+		this.#open = MutableRef.from(open);
+		this.#positioning = Ref.from(positioning);
+		this.#arrowSize = Ref.from(arrowSize);
+		this.#openDelay = Ref.from(openDelay);
+		this.#closeDelay = Ref.from(closeDelay);
+		this.#closeOnPointerDown = Ref.from(closeOnPointerDown);
+		this.#closeOnEscape = Ref.from(closeOnEscape);
+		this.#forceVisible = Ref.from(forceVisible);
+		this.#disableHoverableContent = Ref.from(disableHoverableContent);
+		this.#group = Ref.from(group);
+		this.#portal = Ref.from(portal);
+		this.#triggerId = Ref.from(triggerId);
+		this.#contentId = Ref.from(contentId);
 	}
 
 	#openReason: OpenReason | null = $state(null);
@@ -80,13 +76,61 @@ export class Tooltip {
 
 	// States
 	get open() {
-		return this.#open;
+		return this.#open.value;
 	}
 
 	set open(value) {
-		this.#open = this.#onOpenChange(value);
+		this.#open.value = value;
 		this.#clearOpenTimeout();
 		this.#clearCloseTimeout();
+	}
+
+	get positioning() {
+		return this.#positioning.value;
+	}
+
+	get arrowSize() {
+		return this.#arrowSize.value;
+	}
+
+	get openDelay() {
+		return this.#openDelay.value;
+	}
+
+	get closeDelay() {
+		return this.#closeDelay.value;
+	}
+
+	get closeOnPointerDown() {
+		return this.#closeOnPointerDown.value;
+	}
+
+	get closeOnEscape() {
+		return this.#closeOnEscape.value;
+	}
+
+	get forceVisible() {
+		return this.#forceVisible.value;
+	}
+
+	get disableHoverableContent() {
+		return this.#disableHoverableContent.value;
+	}
+
+	get group() {
+		return this.#group.value;
+	}
+
+	get portal() {
+		return this.#portal.value;
+	}
+
+	get triggerId() {
+		return this.#triggerId.value;
+	}
+
+	get contentId() {
+		return this.#contentId.value;
 	}
 
 	get #hidden() {
@@ -106,11 +150,6 @@ export class Tooltip {
 			window.clearTimeout(this.#closeTimeout);
 			this.#closeTimeout = null;
 		}
-	}
-
-	#getEl(part: TooltipIdParts) {
-		if (!isBrowser) return null;
-		return document.getElementById(this.ids[part]);
 	}
 
 	#openTooltip(reason: OpenReason) {
@@ -146,12 +185,6 @@ export class Tooltip {
 		}
 	}
 
-	#handleKeyDown(e: KeyboardEvent) {
-		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
-			this.open = false;
-		}
-	}
-
 	// Elements
 	readonly trigger = this.#createTrigger();
 
@@ -159,10 +192,10 @@ export class Tooltip {
 		const self = this;
 		return element("tooltip-trigger", {
 			get "aria-describedby"() {
-				return self.ids.content;
+				return self.contentId;
 			},
 			get id() {
-				return self.ids.trigger;
+				return self.triggerId;
 			},
 			onpointerdown() {
 				if (!self.closeOnPointerDown) return;
@@ -188,6 +221,12 @@ export class Tooltip {
 		});
 	}
 
+	#handleKeyDown(e: KeyboardEvent) {
+		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
+			this.open = false;
+		}
+	}
+
 	readonly content = this.#createContent();
 
 	#createContent() {
@@ -202,7 +241,7 @@ export class Tooltip {
 				return self.#hidden ? "display: none;" : undefined;
 			},
 			get id() {
-				return self.ids.content;
+				return self.contentId;
 			},
 			get "data-portal"() {
 				return self.portal ? "" : undefined;
@@ -233,6 +272,7 @@ export class Tooltip {
 		});
 	}
 
+	// Effects
 	readonly dispose = autodisposable(() => {
 		$effect(() => {
 			const group = this.group;
@@ -262,9 +302,9 @@ export class Tooltip {
 		$effect(() => {
 			if (!this.open) return;
 			return addEventListener(document, "mousemove", (e) => {
-				const contentEl = this.#getEl("content");
-				const triggerEl = this.#getEl("trigger");
-				if (!contentEl || !triggerEl) return;
+				const triggerEl = document.getElementById(this.triggerId);
+				const contentEl = document.getElementById(this.contentId);
+				if (!triggerEl || !contentEl) return;
 
 				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
 				const polygon = makeHullFromElements(polygonElements);
@@ -295,8 +335,8 @@ export class Tooltip {
 		$effect(() => {
 			if (this.#hidden) return;
 
-			const triggerEl = this.#getEl("trigger");
-			const contentEl = this.#getEl("content");
+			const triggerEl = document.getElementById(this.triggerId);
+			const contentEl = document.getElementById(this.contentId);
 			if (!triggerEl || !contentEl) {
 				unsubFloating();
 				unsubPortal();

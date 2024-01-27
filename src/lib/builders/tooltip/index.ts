@@ -1,2 +1,2 @@
 export { Tooltip } from "./create.svelte";
-export type { TooltipProps, TooltipIdParts } from "./types";
+export type { TooltipProps } from "./types";
