@@ -7,17 +7,14 @@
 		pressed: true,
 	});
 
-	let pressed = $state(false);
-	let disabled = $state(false);
+	let pressed = box.from(false);
+	let disabled = box.from(false);
 	const controlled = new Toggle({
-		pressed: box(
-			() => pressed,
-			(value) => (pressed = value),
-		),
-		disabled: box(() => disabled),
+		pressed,
+		disabled,
 	});
 
-	$inspect("pressed", pressed, "disabled", disabled);
+	$inspect("pressed", pressed.value, "disabled", disabled.value);
 </script>
 
 <section>
@@ -41,14 +38,14 @@
 
 	<div class="mt-3 flex items-center">
 		<button {...controlled.root} class="btn">
-			{#if pressed}
+			{#if pressed.value}
 				On
 			{:else}
 				Off
 			{/if}
 		</button>
 
-		<ToggleComponent bind:pressed {disabled} class="ml-4">
+		<ToggleComponent bind:pressed={pressed.value} disabled={disabled.value} class="ml-4">
 			{#snippet off()}
 				Off
 			{/snippet}
@@ -59,6 +56,6 @@
 		</ToggleComponent>
 
 		<label for="disabled" class="ml-24 select-none">Disabled</label>
-		<input id="disabled" type="checkbox" bind:checked={disabled} class="ml-2" />
+		<input id="disabled" type="checkbox" bind:checked={disabled.value} class="ml-2" />
 	</div>
 </section>

@@ -6,12 +6,13 @@ export type Write<T> = [Getter<T>, Setter<T>];
 
 export type Box<T extends Read<any> | Write<any>> = T extends Read<infer U>
   ? {
-    get: Getter<U>;
+    readonly value: U;
+    $$BOX: true;
   }
   : T extends Write<infer U>
   ? {
-    get: Getter<U>;
-    set: Setter<U>;
+    value: U;
+    $$BOX: true;
   }
   : never;
 
@@ -23,12 +24,20 @@ export function box<T>(getter: Getter<T>, setter: Setter<T>): Box<Write<T>>;
 export function box<T>(getter: Getter<T>, setter?: Setter<T>): Box<Read<T> | Write<T>> {
   if (setter) {
     return {
-      get: getter,
-      set: setter,
+      get value() {
+        return getter();
+      },
+      set value(v) {
+        setter(v);
+      },
+      $$BOX: true
     };
   } else {
     return {
-      get: getter,
+      get value() {
+        return getter();
+      },
+      $$BOX: true
     };
   }
 }
@@ -40,7 +49,7 @@ export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
   : never;
 
 function isBox<T extends Read<any> | Write<any>>(value: BoxOr<T>): value is Box<T> {
-  return typeof value === "object" && "get" in value;
+  return typeof value === "object" && value !== null && "$$BOX" in value;
 }
 
 function boxFrom<T>(value: BoxOr<Write<T>>): Box<Write<T>>;

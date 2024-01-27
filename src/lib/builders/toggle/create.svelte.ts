@@ -1,36 +1,34 @@
-import { MutableRef, Ref, disabledAttr, element, kbd } from "$lib/internal/helpers";
-import { box, type Box, type BoxFrom, type BoxOr, type Read, type Write } from "$lib/internal/helpers/box.svelte";
+import { disabledAttr, element, kbd } from "$lib/internal/helpers";
+import { box, type BoxFrom } from "$lib/internal/helpers/box.svelte";
+import { createMergeProps } from "$lib/internal/helpers/props";
 import type { ToggleProps } from "./types";
 
-const defaults = {
-	pressed: false as boolean,
-	disabled: false as boolean,
-} satisfies ToggleProps;
-
-const mergeProps = (props: ToggleProps) => ({ ...defaults, ...props });
-
-type MergedProps = ReturnType<typeof mergeProps>
+const mergeProps = createMergeProps({
+	pressed: false,
+	disabled: false,
+});
+type Merged = ReturnType<typeof mergeProps<ToggleProps>>;
 
 export class Toggle {
-	#pressed: BoxFrom<MergedProps["pressed"]>;
-	#disabled: BoxFrom<MergedProps["disabled"]>;
+	#pressed: BoxFrom<Merged["pressed"]>;
+	#disabled: BoxFrom<Merged["disabled"]>;
 
 	constructor(props: ToggleProps = {}) {
-		const { pressed, disabled } = mergeProps(props) as { pressed: BoxOr<Write<boolean>>, disabled: BoxOr<Read<boolean>> }
+		const { pressed, disabled } = mergeProps(props);
 		this.#pressed = box.from(pressed);
 		this.#disabled = box.from(disabled);
 	}
 
 	get pressed() {
-		return this.#pressed.get()
+		return this.#pressed.value;
 	}
 
-	set pressed(value: boolean) {
-		this.#pressed.set(value)
+	set pressed(v: boolean) {
+		this.#pressed.value = v;
 	}
 
 	get disabled() {
-		return this.#disabled.get()
+		return this.#disabled.value;
 	}
 
 	readonly root = this.#createRoot();
@@ -77,13 +75,13 @@ export function createToggle(props: ToggleProps = {}) {
 
 	const states = {
 		get pressed() {
-			return _pressed.get();
+			return _pressed.value;
 		},
-		set pressed(value: boolean) {
-			_pressed.set(value)
+		set pressed(v: boolean) {
+			_pressed.value = v;
 		},
 		get disabled() {
-			return _disabled.get();
+			return _disabled.value;
 		},
 	};
 
