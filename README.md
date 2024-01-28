@@ -44,11 +44,11 @@ The new API relies on classes instead of stores for creating builders.
     });
 </script>
 
-<button use:melt={tooltip.trigger}>Trigger</button>
+<button {...tooltip.trigger}>Trigger</button>
 
 {#if tooltip.open}
-    <div use:melt={tooltip.content}>
-        <div use:melt={tooltip.arrow} />
+    <div {...tooltip.content}>
+        <div {...tooltip.arrow} />
         <p>Hello world!</p>
     </div>
 {/if}
@@ -62,7 +62,7 @@ I hear you saying "Ugh, classes". Let me explain the reasoning behind this choic
 Try out the new API yourself by cloning this repo.
 
 ```bash
-git clone https://github.com/abdel-17/melt-ui-runes-experiment
+git clone https://github.com/melt-ui/runes-experiment.git
 ```
 
 You'll find three builders have been migrated to runes.
