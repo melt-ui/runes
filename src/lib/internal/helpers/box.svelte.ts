@@ -1,105 +1,48 @@
-export abstract class ReadBox<T> {
-	abstract readonly value: T;
-
-	get(): T {
-		return this.value;
-	}
-}
-
-export abstract class WriteBox<T> extends ReadBox<T> {
-	abstract value: T;
-
-	set(value: T) {
-		this.value = value;
-	}
-}
-
-class StateBox<T> extends WriteBox<T> {
-	value = $state() as T;
-
-	constructor(initialValue: T) {
-		super();
-		this.value = initialValue;
-	}
-}
+export type Box<T> = { value: T };
+export type ReadonlyBox<T> = Readonly<Box<T>>;
 
 export type Getter<T> = () => T;
 export type Setter<T> = (value: T) => void;
 
-class DerivedReadBox<T> extends ReadBox<T> {
-	constructor(readonly get: Getter<T>) {
-		super();
-	}
-
-	get value(): T {
-		return this.get();
-	}
-}
-
-class DerivedWriteBox<T> extends WriteBox<T> {
+class DerivedBox<T> implements Box<T> {
 	constructor(
 		readonly get: Getter<T>,
 		readonly set: Setter<T>,
-	) {
-		super();
-	}
+	) {}
 
-	get value(): T {
+	get value() {
 		return this.get();
 	}
 
-	set value(v: T) {
+	set value(v) {
 		this.set(v);
 	}
 }
 
-export function box<T>(getter: Getter<T>): ReadBox<T>;
-export function box<T>(getter: Getter<T>, setter: Setter<T>): WriteBox<T>;
+class ReadonlyDerivedBox<T> implements ReadonlyBox<T> {
+	constructor(readonly get: Getter<T>) {}
 
-export function box<T>(getter: Getter<T>, setter?: Setter<T>) {
-	if (setter) {
-		return new DerivedWriteBox(getter, setter);
-	} else {
-		return new DerivedReadBox(getter);
+	get value() {
+		return this.get();
 	}
 }
 
-export type ReadBoxOr<T> = ReadBox<T> | T;
-export type WriteBoxOr<T> = WriteBox<T> | T;
+export type ReadableProp<T> = T | Getter<T>;
+export type WritableProp<T> = T | { get: Getter<T>; set: Setter<T> };
 
-function boxFrom<T>(value: WriteBoxOr<T>): WriteBox<T>;
-function boxFrom<T>(value: ReadBoxOr<T>): ReadBox<T>;
-function boxFrom<T>(value: T): WriteBox<T>;
-
-function boxFrom<T>(value: T | ReadBox<T>) {
-	if (value instanceof ReadBox) {
-		return value;
+export function readonlyBox<T>(value: ReadableProp<T>): ReadonlyBox<T> {
+	if (typeof value === "function") {
+		return new ReadonlyDerivedBox(value as Getter<T>);
 	} else {
-		return new StateBox(value);
+		return { value };
 	}
 }
 
-box.from = boxFrom;
-
-// export type Box<T extends Read<any> | Write<any>> = T extends Read<infer U>
-// 	? ReadBox<U>
-// 	: T extends Write<infer U>
-// 		? WriteBox<U>
-// 		: never;
-
-// /* Utility functions and types */
-// export type Read<T> = [Getter<T>];
-// export type Write<T> = [Getter<T>, Setter<T>];
-
-// export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
-// 	? Box<Read<U>> | U
-// 	: T extends Write<infer U>
-// 		? Box<Write<U>> | U
-// 		: never;
-
-// // eslint-disable-next-line @typescript-eslint/no-explicit-any
-// export type BoxFrom<T extends BoxOr<any>> = T extends Box<Write<infer U>>
-// 	? Box<Write<U>>
-// 	: T extends Box<Read<infer U>>
-// 		? Box<Read<U>>
-// 		: Box<Write<T>>;
+export function box<T>(value: WritableProp<T>): Box<T> {
+	if (value !== null && typeof value === "object" && "get" in value && "set" in value) {
+		return new DerivedBox(value.get.bind(value), value.set.bind(value));
+	} else {
+		const boxed = $state({ value });
+		return boxed;
+	}
+}

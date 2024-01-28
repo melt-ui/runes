@@ -1,6 +1,6 @@
-import type { ReadBoxOr, WriteBoxOr } from "$lib/internal/helpers/box.svelte";
+import type { ReadableProp, WritableProp } from "$lib/internal/helpers";
 
 export type ToggleProps = {
-	pressed?: WriteBoxOr<boolean>;
-	disabled?: ReadBoxOr<boolean>;
+	pressed?: WritableProp<boolean>;
+	disabled?: ReadableProp<boolean>;
 };

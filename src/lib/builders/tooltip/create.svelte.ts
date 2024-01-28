@@ -1,7 +1,5 @@
 import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
 import {
-	ReadBox,
-	WriteBox,
 	addEventListener,
 	autodisposable,
 	box,
@@ -13,7 +11,10 @@ import {
 	makeHullFromElements,
 	noop,
 	pointInPolygon,
+	readonlyBox,
 	styleToString,
+	type Box,
+	type ReadonlyBox,
 } from "$lib/internal/helpers";
 import type { TooltipProps } from "./types.js";
 
@@ -23,19 +24,19 @@ const openTooltips = new Map<string | true, Tooltip>();
 type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
-	#open: WriteBox<boolean>;
-	#positioning: ReadBox<FloatingConfig>;
-	#arrowSize: ReadBox<number>;
-	#openDelay: ReadBox<number>;
-	#closeDelay: ReadBox<number>;
-	#closeOnPointerDown: ReadBox<boolean>;
-	#closeOnEscape: ReadBox<boolean>;
-	#forceVisible: ReadBox<boolean>;
-	#disableHoverableContent: ReadBox<boolean>;
-	#group: ReadBox<string | boolean | undefined>;
-	#portal: ReadBox<HTMLElement | string | null>;
-	#triggerId: ReadBox<string>;
-	#contentId: ReadBox<string>;
+	#open: Box<boolean>;
+	#positioning: ReadonlyBox<FloatingConfig>;
+	#arrowSize: ReadonlyBox<number>;
+	#openDelay: ReadonlyBox<number>;
+	#closeDelay: ReadonlyBox<number>;
+	#closeOnPointerDown: ReadonlyBox<boolean>;
+	#closeOnEscape: ReadonlyBox<boolean>;
+	#forceVisible: ReadonlyBox<boolean>;
+	#disableHoverableContent: ReadonlyBox<boolean>;
+	#group: ReadonlyBox<string | boolean | undefined>;
+	#portal: ReadonlyBox<HTMLElement | string | null>;
+	#triggerId: ReadonlyBox<string>;
+	#contentId: ReadonlyBox<string>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -54,19 +55,19 @@ export class Tooltip {
 			contentId = generateId(),
 		} = props;
 
-		this.#open = box.from(open);
-		this.#positioning = box.from(positioning);
-		this.#arrowSize = box.from(arrowSize);
-		this.#openDelay = box.from(openDelay);
-		this.#closeDelay = box.from(closeDelay);
-		this.#closeOnPointerDown = box.from(closeOnPointerDown);
-		this.#closeOnEscape = box.from(closeOnEscape);
-		this.#forceVisible = box.from(forceVisible);
-		this.#disableHoverableContent = box.from(disableHoverableContent);
-		this.#group = box.from(group);
-		this.#portal = box.from(portal);
-		this.#triggerId = box.from(triggerId);
-		this.#contentId = box.from(contentId);
+		this.#open = box(open);
+		this.#positioning = readonlyBox(positioning);
+		this.#arrowSize = readonlyBox(arrowSize);
+		this.#openDelay = readonlyBox(openDelay);
+		this.#closeDelay = readonlyBox(closeDelay);
+		this.#closeOnPointerDown = readonlyBox(closeOnPointerDown);
+		this.#closeOnEscape = readonlyBox(closeOnEscape);
+		this.#forceVisible = readonlyBox(forceVisible);
+		this.#disableHoverableContent = readonlyBox(disableHoverableContent);
+		this.#group = readonlyBox(group);
+		this.#portal = readonlyBox(portal);
+		this.#triggerId = readonlyBox(triggerId);
+		this.#contentId = readonlyBox(contentId);
 	}
 
 	#openReason: OpenReason | null = $state(null);

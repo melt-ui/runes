@@ -1,20 +1,23 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-	import { box } from "$lib/internal/helpers";
 	import ToggleComponent from "./Toggle.svelte";
 
 	const uncontrolled = new Toggle({
 		pressed: true,
 	});
 
-	const pressed = box.from(false);
-	const disabled = box.from(false);
+	let pressed = $state(false);
+	let disabled = $state(false);
+
 	const controlled = new Toggle({
-		pressed,
-		disabled,
+		pressed: {
+			get: () => pressed,
+			set: (v) => (pressed = v),
+		},
+		disabled: () => disabled,
 	});
 
-	$inspect("pressed", pressed.value, "disabled", disabled.value);
+	$inspect("pressed", pressed, "disabled", disabled);
 </script>
 
 <section>
@@ -38,14 +41,14 @@
 
 	<div class="mt-3 flex items-center">
 		<button {...controlled.root} class="btn">
-			{#if pressed.value}
+			{#if pressed}
 				On
 			{:else}
 				Off
 			{/if}
 		</button>
 
-		<ToggleComponent bind:pressed={pressed.value} disabled={disabled.value} class="ml-4">
+		<ToggleComponent bind:pressed {disabled} class="ml-4">
 			{#snippet off()}
 				Off
 			{/snippet}
@@ -56,6 +59,6 @@
 		</ToggleComponent>
 
 		<label for="disabled" class="ml-24 select-none">Disabled</label>
-		<input id="disabled" type="checkbox" bind:checked={disabled.value} class="ml-2" />
+		<input id="disabled" type="checkbox" bind:checked={disabled} class="ml-2" />
 	</div>
 </section>
