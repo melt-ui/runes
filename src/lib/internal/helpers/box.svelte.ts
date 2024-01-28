@@ -1,58 +1,47 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 type Getter<T> = () => T;
 type Setter<T> = (value: T) => void;
 
 export type Read<T> = [Getter<T>];
 export type Write<T> = [Getter<T>, Setter<T>];
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type Box<T extends Read<any> | Write<any>> = T extends Read<infer U>
-	? {
-			readonly value: U;
-			$$BOX: true;
-		}
-	: T extends Write<infer U>
-		? {
-				value: U;
-				$$BOX: true;
-			}
-		: never;
+abstract class BaseBox<T> {
+	protected readonly getter: Getter<T>;
 
-// Overload for Read<T>
-export function box<T>(getter: Getter<T>): Box<Read<T>>;
-// Overload for Write<T>
-export function box<T>(getter: Getter<T>, setter: Setter<T>): Box<Write<T>>;
-// Implementation of the function
-export function box<T>(getter: Getter<T>, setter?: Setter<T>): Box<Read<T> | Write<T>> {
-	if (setter) {
-		return {
-			get value() {
-				return getter();
-			},
-			set value(v) {
-				setter(v);
-			},
-			$$BOX: true,
-		};
-	} else {
-		return {
-			get value() {
-				return getter();
-			},
-			$$BOX: true,
-		};
+	constructor(getter: Getter<T>) {
+		this.getter = getter;
+	}
+
+	abstract get value(): T;
+}
+
+class ReadBox<T> extends BaseBox<T> {
+	get value(): T {
+		return this.getter();
 	}
 }
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
-	? Box<Read<U>> | U
-	: T extends Write<infer U>
-		? Box<Write<U>> | U
-		: never;
+class WriteBox<T> extends ReadBox<T> {
+	private readonly setter: Setter<T>;
 
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-function isBox<T extends Read<any> | Write<any>>(value: BoxOr<T>): value is Box<T> {
-	return typeof value === "object" && value !== null && "$$BOX" in value;
+	constructor(getter: Getter<T>, setter: Setter<T>) {
+		super(getter);
+		this.setter = setter;
+	}
+
+	set value(v: T) {
+		this.setter(v);
+	}
+}
+
+export function box<T>(getter: Getter<T>): ReadBox<T>;
+export function box<T>(getter: Getter<T>, setter: Setter<T>): WriteBox<T>;
+export function box(getter: any, setter?: any) {
+	if (setter) {
+		return new WriteBox(getter, setter);
+	} else {
+		return new ReadBox(getter);
+	}
 }
 
 function boxFrom<T>(value: BoxOr<Write<T>>): Box<Write<T>>;
@@ -61,7 +50,7 @@ function boxFrom<T>(value: BoxOr<Read<T>>): Box<Read<T>>;
 function boxFrom<T>(value: Box<Read<T>>): Box<Read<T>>;
 function boxFrom<T>(value: T): Box<Write<T>>;
 function boxFrom(value: unknown): unknown {
-	if (isBox(value)) {
+	if (value instanceof box) {
 		return value;
 	}
 	let v = $state(value);
@@ -73,6 +62,19 @@ function boxFrom(value: unknown): unknown {
 }
 
 box.from = boxFrom;
+
+export type Box<T extends Read<any> | Write<any>> = T extends Read<infer U>
+	? ReadBox<U>
+	: T extends Write<infer U>
+		? WriteBox<U>
+		: never;
+
+/* Utility functions and types */
+export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
+	? Box<Read<U>> | U
+	: T extends Write<infer U>
+		? Box<Write<U>> | U
+		: never;
 
 type CorrectBool<T> = T extends true | false ? boolean : T;
 
