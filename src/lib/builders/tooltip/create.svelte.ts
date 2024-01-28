@@ -1,9 +1,10 @@
 import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
 import {
-	MutableRef,
-	Ref,
+	ReadBox,
+	WriteBox,
 	addEventListener,
 	autodisposable,
+	box,
 	element,
 	generateId,
 	getPortalDestination,
@@ -22,19 +23,19 @@ const openTooltips = new Map<string | true, Tooltip>();
 type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
-	#open: MutableRef<boolean>;
-	#positioning: Ref<FloatingConfig>;
-	#arrowSize: Ref<number>;
-	#openDelay: Ref<number>;
-	#closeDelay: Ref<number>;
-	#closeOnPointerDown: Ref<boolean>;
-	#closeOnEscape: Ref<boolean>;
-	#forceVisible: Ref<boolean>;
-	#disableHoverableContent: Ref<boolean>;
-	#group: Ref<string | boolean | undefined>;
-	#portal: Ref<HTMLElement | string | null>;
-	#triggerId: Ref<string>;
-	#contentId: Ref<string>;
+	#open: WriteBox<boolean>;
+	#positioning: ReadBox<FloatingConfig>;
+	#arrowSize: ReadBox<number>;
+	#openDelay: ReadBox<number>;
+	#closeDelay: ReadBox<number>;
+	#closeOnPointerDown: ReadBox<boolean>;
+	#closeOnEscape: ReadBox<boolean>;
+	#forceVisible: ReadBox<boolean>;
+	#disableHoverableContent: ReadBox<boolean>;
+	#group: ReadBox<string | boolean | undefined>;
+	#portal: ReadBox<HTMLElement | string | null>;
+	#triggerId: ReadBox<string>;
+	#contentId: ReadBox<string>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -53,19 +54,19 @@ export class Tooltip {
 			contentId = generateId(),
 		} = props;
 
-		this.#open = MutableRef.from(open);
-		this.#positioning = Ref.from(positioning);
-		this.#arrowSize = Ref.from(arrowSize);
-		this.#openDelay = Ref.from(openDelay);
-		this.#closeDelay = Ref.from(closeDelay);
-		this.#closeOnPointerDown = Ref.from(closeOnPointerDown);
-		this.#closeOnEscape = Ref.from(closeOnEscape);
-		this.#forceVisible = Ref.from(forceVisible);
-		this.#disableHoverableContent = Ref.from(disableHoverableContent);
-		this.#group = Ref.from(group);
-		this.#portal = Ref.from(portal);
-		this.#triggerId = Ref.from(triggerId);
-		this.#contentId = Ref.from(contentId);
+		this.#open = box.from(open);
+		this.#positioning = box.from(positioning);
+		this.#arrowSize = box.from(arrowSize);
+		this.#openDelay = box.from(openDelay);
+		this.#closeDelay = box.from(closeDelay);
+		this.#closeOnPointerDown = box.from(closeOnPointerDown);
+		this.#closeOnEscape = box.from(closeOnEscape);
+		this.#forceVisible = box.from(forceVisible);
+		this.#disableHoverableContent = box.from(disableHoverableContent);
+		this.#group = box.from(group);
+		this.#portal = box.from(portal);
+		this.#triggerId = box.from(triggerId);
+		this.#contentId = box.from(contentId);
 	}
 
 	#openReason: OpenReason | null = $state(null);

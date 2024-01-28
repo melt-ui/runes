@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-
 	import { box } from "$lib/internal/helpers/box.svelte";
 	import type { Snippet } from "svelte";
 	import type { HTMLButtonAttributes } from "svelte/elements";

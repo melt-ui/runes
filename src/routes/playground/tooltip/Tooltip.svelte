@@ -1,6 +1,6 @@
 <script lang="ts">
 	import { Tooltip } from "$lib";
-	import { MutableDerived } from "$lib/internal/helpers";
+	import { box } from "$lib/internal/helpers";
 	import type { Snippet } from "svelte";
 	import type { HTMLAttributes } from "svelte/elements";
 	import { fade } from "svelte/transition";
@@ -16,14 +16,10 @@
 	let { open = false, class: className = "", trigger, content, ...props } = $props<Props>();
 
 	const tooltip = new Tooltip({
-		open: new MutableDerived({
-			get() {
-				return open;
-			},
-			set(value) {
-				open = value;
-			},
-		}),
+		open: box(
+			() => open,
+			(v) => (open = v),
+		),
 		openDelay: 0,
 		closeDelay: 1000,
 		forceVisible: true,

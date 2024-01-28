@@ -1,14 +1,14 @@
 <script lang="ts">
 	import { Toggle } from "$lib";
-	import { box } from "$lib/internal/helpers/box.svelte";
+	import { box } from "$lib/internal/helpers";
 	import ToggleComponent from "./Toggle.svelte";
 
 	const uncontrolled = new Toggle({
 		pressed: true,
 	});
 
-	let pressed = box.from(false);
-	let disabled = box.from(false);
+	const pressed = box.from(false);
+	const disabled = box.from(false);
 	const controlled = new Toggle({
 		pressed,
 		disabled,
