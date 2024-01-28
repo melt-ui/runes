@@ -80,11 +80,9 @@ export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
 		? Box<Write<U>> | U
 		: never;
 
-type CorrectBool<T> = T extends true | false ? boolean : T;
-
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
 export type BoxFrom<T extends BoxOr<any>> = T extends Box<Write<infer U>>
 	? Box<Write<U>>
 	: T extends Box<Read<infer U>>
 		? Box<Read<U>>
-		: Box<Write<CorrectBool<T>>>;
+		: Box<Write<T>>;
