@@ -21,12 +21,16 @@ class ReadBox<T> extends BaseBox<T> {
 	}
 }
 
-class WriteBox<T> extends ReadBox<T> {
+class WriteBox<T> extends BaseBox<T> {
 	private readonly setter: Setter<T>;
 
 	constructor(getter: Getter<T>, setter: Setter<T>) {
 		super(getter);
 		this.setter = setter;
+	}
+
+	get value(): T {
+		return this.getter();
 	}
 
 	set value(v: T) {
@@ -50,7 +54,7 @@ function boxFrom<T>(value: BoxOr<Read<T>>): Box<Read<T>>;
 function boxFrom<T>(value: Box<Read<T>>): Box<Read<T>>;
 function boxFrom<T>(value: T): Box<Write<T>>;
 function boxFrom(value: unknown): unknown {
-	if (value instanceof box) {
+	if (value instanceof BaseBox) {
 		return value;
 	}
 	let v = $state(value);
