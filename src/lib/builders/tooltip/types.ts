@@ -2,22 +2,72 @@ import type { FloatingConfig } from "$lib/internal/actions/index.js";
 import type { ReadableProp, WritableProp } from "$lib/internal/helpers/index.js";
 
 export type TooltipProps = {
+	/**
+	 * Whether or not the tooltip is open.
+	 *
+	 * @default false
+	 */
 	open?: WritableProp<boolean>;
 
+	/**
+	 * A configuration object which determines how the floating element
+	 * is positioned relative to the trigger.
+	 *
+	 * @default placement: "bottom"
+	 */
 	positioning?: ReadableProp<FloatingConfig>;
 
+	/**
+	 * The size of the arrow which points to the trigger in pixels.
+	 *
+	 * @default 8
+	 */
 	arrowSize?: ReadableProp<number>;
 
+	/**
+	 * The delay in milliseconds before the tooltip opens after a `pointerenter` event.
+	 *
+	 * @default 1000
+	 */
 	openDelay?: ReadableProp<number>;
 
+	/**
+	 * The delay in milliseconds before the tooltip closes after a `pointerleave` event.
+	 *
+	 * @default 0
+	 */
 	closeDelay?: ReadableProp<number>;
 
+	/**
+	 * Whether the tooltip closes when the pointer is down.
+	 *
+	 * @default true
+	 */
 	closeOnPointerDown?: ReadableProp<boolean>;
 
+	/**
+	 * Whether or not to close the tooltip when the escape key is pressed.
+	 *
+	 * @default true
+	 */
 	closeOnEscape?: ReadableProp<boolean>;
 
+	/**
+	 * Whether or not to force the tooltip to always be visible.
+	 *
+	 * This is useful for custom transitions and animations using conditional blocks.
+	 *
+	 * @default false
+	 */
 	forceVisible?: ReadableProp<boolean>;
 
+	/**
+	 * Prevents the tooltip content element from remaining open when hovered.
+	 * 
+	 * If `true`, the tooltip will only be open when hovering the trigger element.
+	 * 
+	 * @default false
+	 */
 	disableHoverableContent?: ReadableProp<boolean>;
 
 	/**
