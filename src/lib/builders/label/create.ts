@@ -1,4 +1,4 @@
-import { element } from "$lib/internal/helpers";
+import { element } from "$lib/internal/helpers/index.js";
 
 export class Label {
 	readonly root = element("label", {

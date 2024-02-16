@@ -1,5 +1,5 @@
-import type { FloatingConfig } from "$lib/internal/actions";
-import type { ReadableProp, WritableProp } from "$lib/internal/helpers";
+import type { FloatingConfig } from "$lib/internal/actions/index.js";
+import type { ReadableProp, WritableProp } from "$lib/internal/helpers/index.js";
 
 export type TooltipProps = {
 	open?: WritableProp<boolean>;

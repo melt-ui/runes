@@ -1,6 +1,6 @@
-import { disabledAttr, element, kbd } from "$lib/internal/helpers";
-import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte";
-import type { ToggleProps } from "./types";
+import { disabledAttr, element, kbd } from "$lib/internal/helpers/index.js";
+import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte.js";
+import type { ToggleProps } from "./types.js";
 
 export class Toggle {
 	#pressed: Box<boolean>;

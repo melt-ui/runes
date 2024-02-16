@@ -1,5 +1,5 @@
 import type { HTMLAttributes } from "svelte/elements";
-import type { Prettify } from "../types";
+import type { Prettify } from "../types.js";
 
 export function element<
 	const TName extends string,

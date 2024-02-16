@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Toggle } from "$lib";
+	import { Toggle } from "$lib/index.js";
 	import type { Snippet } from "svelte";
 	import type { HTMLButtonAttributes } from "svelte/elements";
 

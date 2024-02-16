@@ -1,4 +1,4 @@
-import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
+import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions/index.js";
 import {
 	addEventListener,
 	autodisposable,
@@ -15,7 +15,7 @@ import {
 	styleToString,
 	type Box,
 	type ReadonlyBox,
-} from "$lib/internal/helpers";
+} from "$lib/internal/helpers/index.js";
 import type { TooltipProps } from "./types.js";
 
 // Store a global map to get the currently open tooltip in a given group.

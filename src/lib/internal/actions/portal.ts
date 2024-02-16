@@ -1,6 +1,6 @@
 import { tick } from "svelte";
 import type { ActionReturn } from "svelte/action";
-import { isHTMLElement } from "../helpers";
+import { isHTMLElement } from "../helpers/index.js";
 
 export type PortalTarget = string | HTMLElement | undefined;
 

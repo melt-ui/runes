@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { Tooltip } from "$lib";
+	import { Tooltip } from "$lib/index.js";
 	import { fade } from "svelte/transition";
 	import TooltipComponent from "./Tooltip.svelte";
 
