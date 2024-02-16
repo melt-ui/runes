@@ -63,9 +63,9 @@ export type TooltipProps = {
 
 	/**
 	 * Prevents the tooltip content element from remaining open when hovered.
-	 * 
+	 *
 	 * If `true`, the tooltip will only be open when hovering the trigger element.
-	 * 
+	 *
 	 * @default false
 	 */
 	disableHoverableContent?: ReadableProp<boolean>;
