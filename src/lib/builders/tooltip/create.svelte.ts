@@ -2,6 +2,7 @@ import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actio
 import {
 	addEventListener,
 	autodisposable,
+	booleanAttr,
 	box,
 	element,
 	generateId,
@@ -237,7 +238,7 @@ export class Tooltip {
 			role: "tooltip",
 			tabindex: -1,
 			get hidden() {
-				return self.#hidden ? true : undefined;
+				return booleanAttr(self.#hidden);
 			},
 			get style() {
 				return self.#hidden ? "display: none;" : undefined;

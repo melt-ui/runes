@@ -1,4 +1,4 @@
-import { disabledAttr, element, kbd } from "$lib/internal/helpers/index.js";
+import { booleanAttr, element, kbd } from "$lib/internal/helpers/index.js";
 import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte.js";
 import type { ToggleProps } from "./types.js";
 
@@ -31,10 +31,10 @@ export class Toggle {
 		return element("toggle", {
 			type: "button",
 			get disabled() {
-				return disabledAttr(self.disabled);
+				return booleanAttr(self.disabled);
 			},
 			get "data-disabled"() {
-				return disabledAttr(self.disabled);
+				return booleanAttr(self.disabled);
 			},
 			get "data-state"() {
 				return self.pressed ? "on" : "off";
@@ -80,10 +80,10 @@ export function createToggle(props: ToggleProps = {}) {
 
 	const root = element("toggle", {
 		get disabled() {
-			return disabledAttr(states.disabled);
+			return booleanAttr(states.disabled);
 		},
 		get "data-disabled"() {
-			return disabledAttr(states.disabled);
+			return booleanAttr(states.disabled);
 		},
 		get "data-state"() {
 			return states.pressed ? "on" : "off";
