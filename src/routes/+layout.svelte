@@ -2,4 +2,6 @@
 	import "../app.postcss";
 </script>
 
-<slot />
+<main class="mx-auto max-w-lg p-8">
+	<slot />
+</main>

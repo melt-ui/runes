@@ -31,9 +31,7 @@ export class Toggle {
 		return this.#disabled.value;
 	}
 
-	readonly root = this.#createRoot();
-
-	#createRoot() {
+	root() {
 		const self = this;
 		return element("toggle", {
 			type: "button",

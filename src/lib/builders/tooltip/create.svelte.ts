@@ -189,9 +189,7 @@ export class Tooltip {
 	}
 
 	// Elements
-	readonly trigger = this.#createTrigger();
-
-	#createTrigger() {
+	trigger() {
 		const self = this;
 		return element("tooltip-trigger", {
 			get "aria-describedby"() {
@@ -230,9 +228,7 @@ export class Tooltip {
 		}
 	}
 
-	readonly content = this.#createContent();
-
-	#createContent() {
+	content() {
 		const self = this;
 		return element("tooltip-content", {
 			role: "tooltip",
@@ -258,9 +254,7 @@ export class Tooltip {
 		});
 	}
 
-	readonly arrow = this.#createArrow();
-
-	#createArrow() {
+	arrow() {
 		const self = this;
 		return element("tooltip-arrow", {
 			"data-arrow": true,
