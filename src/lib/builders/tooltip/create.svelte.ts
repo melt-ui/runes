@@ -1,7 +1,7 @@
 import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions/index.js";
 import {
 	addEventListener,
-	autodisposable,
+	autoDestroyEffectRoot,
 	booleanAttr,
 	element,
 	generateId,
@@ -276,7 +276,7 @@ export class Tooltip {
 	}
 
 	// Effects
-	readonly dispose = autodisposable(() => {
+	readonly destroy = autoDestroyEffectRoot(() => {
 		$effect(() => {
 			const group = this.group;
 			if (group === undefined || group === false) return;
