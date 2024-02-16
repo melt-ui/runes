@@ -1,15 +1,22 @@
-import { booleanAttr, element, kbd } from "$lib/internal/helpers/index.js";
-import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte.js";
+import {
+	booleanAttr,
+	element,
+	kbd,
+	readableBox,
+	writableBox,
+	type ReadableBox,
+	type WritableBox,
+} from "$lib/internal/helpers/index.js";
 import type { ToggleProps } from "./types.js";
 
 export class Toggle {
-	#pressed: Box<boolean>;
-	#disabled: ReadonlyBox<boolean>;
+	#pressed: WritableBox<boolean>;
+	#disabled: ReadableBox<boolean>;
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
-		this.#pressed = box(pressed);
-		this.#disabled = readonlyBox(disabled);
+		this.#pressed = writableBox(pressed);
+		this.#disabled = readableBox(disabled);
 	}
 
 	get pressed() {
@@ -63,8 +70,8 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	const _pressed = box(props.pressed ?? false);
-	const _disabled = readonlyBox(props.disabled ?? false);
+	const _pressed = writableBox(props.pressed ?? false);
+	const _disabled = readableBox(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
