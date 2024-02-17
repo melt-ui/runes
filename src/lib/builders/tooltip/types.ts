@@ -13,9 +13,11 @@ export type TooltipProps = {
 	 * A configuration object which determines how the floating element
 	 * is positioned relative to the trigger.
 	 *
+	 * When `null`, the element won't use floating-ui.
+	 *
 	 * @default placement: "bottom"
 	 */
-	positioning?: ReadableProp<FloatingConfig>;
+	positioning?: ReadableProp<FloatingConfig | null>;
 
 	/**
 	 * The size of the arrow which points to the trigger in pixels.

@@ -26,7 +26,7 @@ type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
 	#open: WritableBox<boolean>;
-	#positioning: ReadableBox<FloatingConfig>;
+	#positioning: ReadableBox<FloatingConfig | null>;
 	#arrowSize: ReadableBox<number>;
 	#openDelay: ReadableBox<number>;
 	#closeDelay: ReadableBox<number>;
@@ -142,14 +142,14 @@ export class Tooltip {
 
 	// Helpers
 	#clearOpenTimeout() {
-		if (this.#openTimeout) {
+		if (this.#openTimeout !== null) {
 			window.clearTimeout(this.#openTimeout);
 			this.#openTimeout = null;
 		}
 	}
 
 	#clearCloseTimeout() {
-		if (this.#closeTimeout) {
+		if (this.#closeTimeout !== null) {
 			window.clearTimeout(this.#closeTimeout);
 			this.#closeTimeout = null;
 		}
@@ -158,7 +158,7 @@ export class Tooltip {
 	#openTooltip(reason: OpenReason) {
 		this.#clearCloseTimeout();
 
-		if (!this.#openTimeout) {
+		if (this.#openTimeout === null) {
 			this.#openTimeout = window.setTimeout(() => {
 				this.open = true;
 				// Don't override the reason if it's already set.
@@ -179,7 +179,7 @@ export class Tooltip {
 			return;
 		}
 
-		if (!this.#closeTimeout) {
+		if (this.#closeTimeout === null) {
 			this.#closeTimeout = window.setTimeout(() => {
 				this.open = false;
 				this.#openReason = null;
@@ -301,7 +301,7 @@ export class Tooltip {
 			return addEventListener(document, "mousemove", (e) => {
 				const triggerEl = document.getElementById(this.triggerId);
 				const contentEl = document.getElementById(this.contentId);
-				if (!triggerEl || !contentEl) return;
+				if (triggerEl === null || contentEl === null) return;
 
 				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
 				const polygon = makeHullFromElements(polygonElements);
@@ -330,24 +330,28 @@ export class Tooltip {
 		let unsubPortal = noop;
 
 		$effect(() => {
-			if (this.#hidden) return;
-
+			const hidden = this.#hidden;
+			const positioning = this.positioning;
+			const portal = this.portal;
 			const triggerEl = document.getElementById(this.triggerId);
 			const contentEl = document.getElementById(this.contentId);
-			if (!triggerEl || !contentEl) {
+
+			if (
+				hidden ||
+				positioning === null ||
+				portal === null ||
+				triggerEl === null ||
+				contentEl === null
+			) {
 				unsubFloating();
 				unsubPortal();
 				return;
 			}
 
-			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
+			const floatingReturn = useFloating(triggerEl, contentEl, positioning);
 			unsubFloating = floatingReturn.destroy;
-			if (!this.portal) {
-				unsubFloating();
-				return;
-			}
 
-			const portalDest = getPortalDestination(contentEl, this.portal);
+			const portalDest = getPortalDestination(contentEl, portal);
 			if (portalDest) {
 				const portalReturn = usePortal(contentEl, portalDest);
 				unsubPortal = portalReturn.destroy;
