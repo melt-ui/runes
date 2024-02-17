@@ -350,9 +350,7 @@ export class Tooltip {
 			const portalDest = getPortalDestination(contentEl, this.portal);
 			if (portalDest) {
 				const portalReturn = usePortal(contentEl, portalDest);
-				if (portalReturn && portalReturn.destroy) {
-					unsubPortal = portalReturn.destroy;
-				}
+				unsubPortal = portalReturn.destroy;
 			}
 		});
 
