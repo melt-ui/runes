@@ -1,4 +1,4 @@
-import type { FloatingConfig } from "$lib/internal/actions/index.js";
+import type { FloatingConfig, PortalTarget } from "$lib/internal/actions/index.js";
 import type { ReadableProp, WritableProp } from "$lib/internal/helpers/index.js";
 
 export type TooltipProps = {
@@ -13,7 +13,7 @@ export type TooltipProps = {
 	 * A configuration object which determines how the floating element
 	 * is positioned relative to the trigger.
 	 *
-	 * When `null`, the element won't use floating-ui.
+	 * If `null`, the element won't use floating-ui.
 	 *
 	 * @default placement: "bottom"
 	 */
@@ -73,19 +73,19 @@ export type TooltipProps = {
 	disableHoverableContent?: ReadableProp<boolean>;
 
 	/**
-	 * If set to `true`, whenever you open this tooltip, all other tooltips
-	 * with `group` also set to `true` will close. If you pass in a string
-	 * instead, only tooltips with the same `group` value will be closed.
+	 * If set to `true` or a string, whenever you open this tooltip
+	 * all other tooltips with the same `group` value will close.
 	 */
 	group?: ReadableProp<boolean | string | undefined>;
 
 	/**
-	 *
-	 * If not undefined, the tooltip will be rendered within the provided element or selector.
+	 * If not `undefined`, the tooltip will be rendered within the provided element or selector.
+	 * 
+	 * If `null`, the element won't portal.
 	 *
 	 * @default 'body'
 	 */
-	portal?: ReadableProp<HTMLElement | string | null>;
+	portal?: ReadableProp<PortalTarget | null>;
 
 	/**
 	 * Optionally override the default ids we assign to the trigger element.

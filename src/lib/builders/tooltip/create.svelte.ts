@@ -1,4 +1,9 @@
-import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions/index.js";
+import {
+	useFloating,
+	usePortal,
+	type FloatingConfig,
+	type PortalTarget,
+} from "$lib/internal/actions/index.js";
 import {
 	addEventListener,
 	autoDestroyEffectRoot,
@@ -35,7 +40,7 @@ export class Tooltip {
 	#forceVisible: ReadableBox<boolean>;
 	#disableHoverableContent: ReadableBox<boolean>;
 	#group: ReadableBox<string | boolean | undefined>;
-	#portal: ReadableBox<HTMLElement | string | null>;
+	#portal: ReadableBox<PortalTarget | null>;
 	#triggerId: ReadableBox<string>;
 	#contentId: ReadableBox<string>;
 
@@ -51,7 +56,7 @@ export class Tooltip {
 			forceVisible = false,
 			disableHoverableContent = false,
 			group,
-			portal = "body",
+			portal,
 			triggerId = generateId(),
 			contentId = generateId(),
 		} = props;
@@ -352,10 +357,8 @@ export class Tooltip {
 			unsubFloating = floatingReturn.destroy;
 
 			const portalDest = getPortalDestination(contentEl, portal);
-			if (portalDest) {
-				const portalReturn = usePortal(contentEl, portalDest);
-				unsubPortal = portalReturn.destroy;
-			}
+			const portalReturn = usePortal(contentEl, portalDest);
+			unsubPortal = portalReturn.destroy;
 		});
 
 		return () => {
