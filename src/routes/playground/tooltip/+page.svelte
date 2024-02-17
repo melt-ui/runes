@@ -26,7 +26,7 @@
 	});
 
 	$inspect("open", open);
-	$inspect("nested open", nested.open);
+	$inspect("nested.open", nested.open);
 </script>
 
 <h1>Tooltip</h1>

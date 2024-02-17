@@ -76,7 +76,7 @@ export class Tooltip {
 		this.#contentId = readableBox(contentId);
 	}
 
-	#openReason: OpenReason | null = $state(null);
+	#openReason: OpenReason | null = null;
 	#isMouseInTooltipArea = false;
 	#clickedTrigger = false;
 	#openTimeout: number | null = null;
@@ -248,7 +248,7 @@ export class Tooltip {
 				return self.contentId;
 			},
 			get "data-portal"() {
-				return self.portal ? "" : undefined;
+				return self.portal !== null ? "" : undefined;
 			},
 			onpointerenter() {
 				self.#openTooltip("pointer");
@@ -335,28 +335,23 @@ export class Tooltip {
 		let unsubPortal = noop;
 
 		$effect(() => {
-			const hidden = this.#hidden;
-			const positioning = this.positioning;
-			const portal = this.portal;
 			const triggerEl = document.getElementById(this.triggerId);
 			const contentEl = document.getElementById(this.contentId);
-
-			if (
-				hidden ||
-				positioning === null ||
-				portal === null ||
-				triggerEl === null ||
-				contentEl === null
-			) {
+			if (this.#hidden || this.positioning === null || triggerEl === null || contentEl === null) {
 				unsubFloating();
 				unsubPortal();
 				return;
 			}
 
-			const floatingReturn = useFloating(triggerEl, contentEl, positioning);
+			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
 			unsubFloating = floatingReturn.destroy;
 
-			const portalDest = getPortalDestination(contentEl, portal);
+			if (this.portal === null) {
+				unsubPortal();
+				return;
+			}
+
+			const portalDest = getPortalDestination(contentEl, this.portal);
 			const portalReturn = usePortal(contentEl, portalDest);
 			unsubPortal = portalReturn.destroy;
 		});
