@@ -337,7 +337,7 @@ export class Tooltip {
 		$effect(() => {
 			const triggerEl = document.getElementById(this.triggerId);
 			const contentEl = document.getElementById(this.contentId);
-			if (this.#hidden || this.positioning === null || triggerEl === null || contentEl === null) {
+			if (this.#hidden || triggerEl === null || contentEl === null) {
 				unsubFloating();
 				unsubPortal();
 				return;
