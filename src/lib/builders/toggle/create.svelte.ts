@@ -10,25 +10,25 @@ import {
 import type { ToggleProps } from "./types.js";
 
 export class Toggle {
-	#pressed: WritableBox<boolean>;
-	#disabled: ReadableBox<boolean>;
+	#pressedBox: WritableBox<boolean>;
+	#disabledBox: ReadableBox<boolean>;
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
-		this.#pressed = writableBox(pressed);
-		this.#disabled = readableBox(disabled);
+		this.#pressedBox = writableBox(pressed);
+		this.#disabledBox = readableBox(disabled);
 	}
 
 	get pressed() {
-		return this.#pressed.value;
+		return this.#pressedBox.value;
 	}
 
 	set pressed(v: boolean) {
-		this.#pressed.value = v;
+		this.#pressedBox.value = v;
 	}
 
 	get disabled() {
-		return this.#disabled.value;
+		return this.#disabledBox.value;
 	}
 
 	root() {
