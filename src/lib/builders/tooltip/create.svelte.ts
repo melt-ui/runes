@@ -340,25 +340,23 @@ export class Tooltip {
 			if (this.#hidden || triggerEl === null || contentEl === null) {
 				unsubFloating();
 				unsubPortal();
+				unsubFloating = unsubPortal = noop;
 				return;
 			}
 
-			if (this.positioning === null) {
-				unsubFloating();
-				unsubFloating = noop;
-			} else {
-				const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
-				unsubFloating = floatingReturn.destroy;
-			}
+			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
+			unsubFloating();
+			unsubFloating = floatingReturn.destroy;
 
 			if (this.portal === null) {
 				unsubPortal();
 				unsubPortal = noop;
-			} else {
-				const portalDest = getPortalDestination(contentEl, this.portal);
-				const portalReturn = usePortal(contentEl, portalDest);
-				unsubPortal = portalReturn.destroy;
+				return;
 			}
+
+			const portalDest = getPortalDestination(contentEl, this.portal);
+			const portalReturn = usePortal(contentEl, portalDest);
+			unsubPortal = portalReturn.destroy;
 		});
 
 		return () => {
