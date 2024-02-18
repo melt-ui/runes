@@ -345,6 +345,7 @@ export class Tooltip {
 
 			if (this.positioning === null) {
 				unsubFloating();
+				unsubFloating = noop;
 			} else {
 				const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
 				unsubFloating = floatingReturn.destroy;
@@ -352,6 +353,7 @@ export class Tooltip {
 
 			if (this.portal === null) {
 				unsubPortal();
+				unsubPortal = noop;
 			} else {
 				const portalDest = getPortalDestination(contentEl, this.portal);
 				const portalReturn = usePortal(contentEl, portalDest);
