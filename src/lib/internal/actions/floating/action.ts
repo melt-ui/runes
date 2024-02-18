@@ -35,7 +35,7 @@ const ARROW_TRANSFORM = {
 export function useFloating(
 	reference: HTMLElement | VirtualElement,
 	floating: HTMLElement,
-	config: FloatingConfig | null = {},
+	config: FloatingConfig = {},
 ) {
 	const options = { ...defaultConfig, ...config };
 

@@ -343,17 +343,20 @@ export class Tooltip {
 				return;
 			}
 
-			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
-			unsubFloating = floatingReturn.destroy;
+			if (this.positioning === null) {
+				unsubFloating();
+			} else {
+				const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
+				unsubFloating = floatingReturn.destroy;
+			}
 
 			if (this.portal === null) {
 				unsubPortal();
-				return;
+			} else {
+				const portalDest = getPortalDestination(contentEl, this.portal);
+				const portalReturn = usePortal(contentEl, portalDest);
+				unsubPortal = portalReturn.destroy;
 			}
-
-			const portalDest = getPortalDestination(contentEl, this.portal);
-			const portalReturn = usePortal(contentEl, portalDest);
-			unsubPortal = portalReturn.destroy;
 		});
 
 		return () => {
