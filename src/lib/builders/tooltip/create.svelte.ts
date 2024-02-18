@@ -5,6 +5,7 @@ import {
 	type PortalTarget,
 } from "$lib/internal/actions/index.js";
 import {
+	DerivedBox,
 	addEventListener,
 	autoDestroyEffectRoot,
 	booleanAttr,
@@ -30,19 +31,20 @@ const openTooltips = new Map<string | true, Tooltip>();
 type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
-	#open: WritableBox<boolean>;
-	#positioning: ReadableBox<FloatingConfig | null>;
-	#arrowSize: ReadableBox<number>;
-	#openDelay: ReadableBox<number>;
-	#closeDelay: ReadableBox<number>;
-	#closeOnPointerDown: ReadableBox<boolean>;
-	#closeOnEscape: ReadableBox<boolean>;
-	#forceVisible: ReadableBox<boolean>;
-	#disableHoverableContent: ReadableBox<boolean>;
-	#group: ReadableBox<string | boolean | undefined>;
-	#portal: ReadableBox<PortalTarget | null>;
-	#triggerId: ReadableBox<string>;
-	#contentId: ReadableBox<string>;
+	#openBox: WritableBox<boolean>;
+	#positioningBox: ReadableBox<FloatingConfig | null>;
+	#arrowSizeBox: ReadableBox<number>;
+	#openDelayBox: ReadableBox<number>;
+	#closeDelayBox: ReadableBox<number>;
+	#closeOnPointerDownBox: ReadableBox<boolean>;
+	#closeOnEscapeBox: ReadableBox<boolean>;
+	#forceVisibleBox: ReadableBox<boolean>;
+	#disableHoverableContentBox: ReadableBox<boolean>;
+	#groupBox: ReadableBox<string | boolean | undefined>;
+	#portalBox: ReadableBox<PortalTarget | null>;
+	#triggerIdBox: ReadableBox<string>;
+	#contentIdBox: ReadableBox<string>;
+	#hiddenBox: ReadableBox<boolean>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -61,19 +63,22 @@ export class Tooltip {
 			contentId = generateId(),
 		} = props;
 
-		this.#open = writableBox(open);
-		this.#positioning = readableBox(positioning);
-		this.#arrowSize = readableBox(arrowSize);
-		this.#openDelay = readableBox(openDelay);
-		this.#closeDelay = readableBox(closeDelay);
-		this.#closeOnPointerDown = readableBox(closeOnPointerDown);
-		this.#closeOnEscape = readableBox(closeOnEscape);
-		this.#forceVisible = readableBox(forceVisible);
-		this.#disableHoverableContent = readableBox(disableHoverableContent);
-		this.#group = readableBox(group);
-		this.#portal = readableBox(portal);
-		this.#triggerId = readableBox(triggerId);
-		this.#contentId = readableBox(contentId);
+		this.#openBox = writableBox(open);
+		this.#positioningBox = readableBox(positioning);
+		this.#arrowSizeBox = readableBox(arrowSize);
+		this.#openDelayBox = readableBox(openDelay);
+		this.#closeDelayBox = readableBox(closeDelay);
+		this.#closeOnPointerDownBox = readableBox(closeOnPointerDown);
+		this.#closeOnEscapeBox = readableBox(closeOnEscape);
+		this.#forceVisibleBox = readableBox(forceVisible);
+		this.#disableHoverableContentBox = readableBox(disableHoverableContent);
+		this.#groupBox = readableBox(group);
+		this.#portalBox = readableBox(portal);
+		this.#triggerIdBox = readableBox(triggerId);
+		this.#contentIdBox = readableBox(contentId);
+
+		const hidden = $derived(!this.open && !this.forceVisible);
+		this.#hiddenBox = new DerivedBox(() => hidden);
 	}
 
 	#openReason: OpenReason | null = null;
@@ -84,65 +89,65 @@ export class Tooltip {
 
 	// States
 	get open() {
-		return this.#open.value;
+		return this.#openBox.value;
 	}
 
 	set open(value) {
-		this.#open.value = value;
+		this.#openBox.value = value;
 		this.#clearOpenTimeout();
 		this.#clearCloseTimeout();
 	}
 
 	get positioning() {
-		return this.#positioning.value;
+		return this.#positioningBox.value;
 	}
 
 	get arrowSize() {
-		return this.#arrowSize.value;
+		return this.#arrowSizeBox.value;
 	}
 
 	get openDelay() {
-		return this.#openDelay.value;
+		return this.#openDelayBox.value;
 	}
 
 	get closeDelay() {
-		return this.#closeDelay.value;
+		return this.#closeDelayBox.value;
 	}
 
 	get closeOnPointerDown() {
-		return this.#closeOnPointerDown.value;
+		return this.#closeOnPointerDownBox.value;
 	}
 
 	get closeOnEscape() {
-		return this.#closeOnEscape.value;
+		return this.#closeOnEscapeBox.value;
 	}
 
 	get forceVisible() {
-		return this.#forceVisible.value;
+		return this.#forceVisibleBox.value;
 	}
 
 	get disableHoverableContent() {
-		return this.#disableHoverableContent.value;
+		return this.#disableHoverableContentBox.value;
 	}
 
 	get group() {
-		return this.#group.value;
+		return this.#groupBox.value;
 	}
 
 	get portal() {
-		return this.#portal.value;
+		return this.#portalBox.value;
 	}
 
 	get triggerId() {
-		return this.#triggerId.value;
+		return this.#triggerIdBox.value;
 	}
 
 	get contentId() {
-		return this.#contentId.value;
+		return this.#contentIdBox.value;
 	}
 
 	get #hidden() {
-		return !this.open && !this.forceVisible;
+		return this.#hiddenBox.value;
 	}
 
 	// Helpers

@@ -4,10 +4,10 @@ export type WritableBox<T> = { value: T };
 export type Getter<T> = () => T;
 export type Setter<T> = (value: T) => void;
 
-class DerivedBox<T> implements ReadableBox<T> {
+export class DerivedBox<T> implements ReadableBox<T> {
 	constructor(
-		readonly get: Getter<T>,
-		readonly set?: Setter<T>,
+		private readonly get: Getter<T>,
+		private readonly set?: Setter<T>,
 	) {}
 
 	get value() {
