@@ -5,7 +5,6 @@ import {
 	type PortalTarget,
 } from "$lib/internal/actions/index.js";
 import {
-	DerivedBox,
 	addEventListener,
 	autoDestroyEffectRoot,
 	booleanAttr,
@@ -44,7 +43,6 @@ export class Tooltip {
 	#portalBox: ReadableBox<PortalTarget | null>;
 	#triggerIdBox: ReadableBox<string>;
 	#contentIdBox: ReadableBox<string>;
-	#hiddenBox: ReadableBox<boolean>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -76,9 +74,6 @@ export class Tooltip {
 		this.#portalBox = readableBox(portal);
 		this.#triggerIdBox = readableBox(triggerId);
 		this.#contentIdBox = readableBox(contentId);
-
-		const hidden = $derived(!this.open && !this.forceVisible);
-		this.#hiddenBox = new DerivedBox(() => hidden);
 	}
 
 	#openReason: OpenReason | null = null;
@@ -147,7 +142,7 @@ export class Tooltip {
 	}
 
 	get #hidden() {
-		return this.#hiddenBox.value;
+		return !this.open && !this.forceVisible;
 	}
 
 	// Helpers
