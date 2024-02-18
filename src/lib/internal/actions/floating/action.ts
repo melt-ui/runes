@@ -2,6 +2,7 @@
 // Source: https://github.com/grail-ui/grail-ui
 // https://github.com/grail-ui/grail-ui/tree/master/packages/grail-ui/src/floating/placement.ts
 
+import { isHTMLElement, noop } from "$lib/internal/helpers/index.js";
 import type { VirtualElement } from "@floating-ui/core";
 import {
 	arrow,
@@ -13,7 +14,6 @@ import {
 	size,
 	type Middleware,
 } from "@floating-ui/dom";
-import { isHTMLElement, noop } from "$lib/internal/helpers/index.js";
 import type { FloatingConfig } from "./types.js";
 
 const defaultConfig = {
