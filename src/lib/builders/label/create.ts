@@ -7,10 +7,12 @@ const ELEMENTS = {
 export class Label {
 	root() {
 		return element(ELEMENTS.root, {
-			onmousedown(e: MouseEvent) {
-				if (!e.defaultPrevented && e.detail > 1) {
-					e.preventDefault();
-				}
+			on: {
+				mousedown: (e) => {
+					if (!e.defaultPrevented && e.detail > 1) {
+						e.preventDefault();
+					}
+				},
 			},
 		});
 	}

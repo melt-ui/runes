@@ -10,6 +10,7 @@ import {
 	readableBox,
 	snapValueToStep,
 	styleToString,
+	type HTMLElementEvent,
 	type ReadableBox,
 	type StyleObject,
 } from "$lib/internal/helpers/index.js";
@@ -212,51 +213,43 @@ export class Slider {
 
 	// Elements
 	root() {
-		const self = this;
 		return element(ELEMENTS.root, {
-			get id() {
-				return self.rootId;
-			},
-			get dir() {
-				return self.dir;
-			},
-			get disabled() {
-				return booleanAttr(self.disabled);
-			},
-			get style() {
-				return styleToString({
-					position: "relative",
-					"touch-action": self.disabled ? undefined : self.horizontal ? "pan-y" : "pan-x",
-				});
-			},
-			get "data-disabled"() {
-				return booleanAttr(self.disabled);
-			},
-			get "data-orientation"() {
-				return self.orientation;
+			props: {
+				id: () => this.rootId,
+				dir: () => this.dir,
+				disabled: () => booleanAttr(this.disabled),
+				style: () => {
+					return styleToString({
+						position: "relative",
+						"touch-action": this.disabled ? undefined : this.horizontal ? "pan-y" : "pan-x",
+					});
+				},
+				"data-disabled": () => booleanAttr(this.disabled),
+				"data-orientation": () => this.orientation,
 			},
 		});
 	}
 
 	range() {
-		const self = this;
 		return element(ELEMENTS.range, {
-			get style() {
-				const style: StyleObject = {
-					position: "absolute",
-				};
+			props: {
+				style: () => {
+					const style: StyleObject = {
+						position: "absolute",
+					};
 
-				const start = self.value.length > 1 ? self.#getPosition(Math.min(...self.value)) : 0;
-				const end = 100 - self.#getPosition(Math.max(...self.value));
-				if (self.horizontal) {
-					style.left = self.ltr ? `${start}%` : `${end}%`;
-					style.right = self.ltr ? `${end}%` : `${start}%`;
-				} else {
-					style.top = self.ltr ? `${end}%` : `${start}%`;
-					style.bottom = self.ltr ? `${start}%` : `${end}%`;
-				}
+					const start = this.value.length > 1 ? this.#getPosition(Math.min(...this.value)) : 0;
+					const end = 100 - this.#getPosition(Math.max(...this.value));
+					if (this.horizontal) {
+						style.left = this.ltr ? `${start}%` : `${end}%`;
+						style.right = this.ltr ? `${end}%` : `${start}%`;
+					} else {
+						style.top = this.ltr ? `${end}%` : `${start}%`;
+						style.bottom = this.ltr ? `${start}%` : `${end}%`;
+					}
 
-				return styleToString(style);
+					return styleToString(style);
+				},
 			},
 		});
 	}
@@ -269,127 +262,120 @@ export class Slider {
 	}
 
 	#thumb(i: number) {
-		const self = this;
-		const thumbValue = $derived(self.value[i] || self.min);
+		const thumbValue = $derived(this.value[i] || this.min);
 		return element(ELEMENTS.thumb, {
-			role: "slider",
-			get "aria-valuemin"() {
-				return self.min;
-			},
-			get "aria-valuemax"() {
-				return self.max;
-			},
-			get "aria-valuenow"() {
-				return thumbValue;
-			},
-			get "aria-disabled"() {
-				return self.disabled;
-			},
-			get "aria-orientation"() {
-				return self.orientation;
-			},
-			get tabindex() {
-				return self.disabled ? -1 : 0;
-			},
-			get style() {
-				const style: StyleObject = {
-					position: "absolute",
-				};
+			props: {
+				role: "slider",
+				"aria-valuemin": () => this.min,
+				"aria-valuemax": () => this.max,
+				"aria-valuenow": () => thumbValue,
+				"aria-disabled": () => this.disabled,
+				"aria-orientation": () => this.orientation,
+				tabindex: () => {
+					return this.disabled ? -1 : 0;
+				},
+				style: () => {
+					const style: StyleObject = {
+						position: "absolute",
+					};
 
-				const thumbPosition = self.#getPosition(thumbValue);
-				if (self.horizontal) {
-					const direction = self.ltr ? "left" : "right";
-					style[direction] = `${thumbPosition}%`;
-					style.translate = self.ltr ? "-50% 0" : "50% 0";
-				} else {
-					const direction = self.ltr ? "bottom" : "top";
-					style[direction] = `${thumbPosition}%`;
-					style.translate = self.ltr ? "0 50%" : "0 -50%";
-				}
-
-				return styleToString(style);
-			},
-			get "data-value"() {
-				return thumbValue;
-			},
-			onkeydown(e: KeyboardEvent) {
-				if (self.disabled) return;
-				switch (e.key) {
-					case kbd.HOME: {
-						e.preventDefault();
-						self.#updatePosition(self.min, i);
-						break;
+					const thumbPosition = this.#getPosition(thumbValue);
+					if (this.horizontal) {
+						const direction = this.ltr ? "left" : "right";
+						style[direction] = `${thumbPosition}%`;
+						style.translate = this.ltr ? "-50% 0" : "50% 0";
+					} else {
+						const direction = this.ltr ? "bottom" : "top";
+						style[direction] = `${thumbPosition}%`;
+						style.translate = this.ltr ? "0 50%" : "0 -50%";
 					}
-					case kbd.END: {
-						e.preventDefault();
-						self.#updatePosition(self.max, i);
-						break;
-					}
-					case kbd.ARROW_LEFT: {
-						if (!self.horizontal) break;
 
-						e.preventDefault();
-
-						if (e.metaKey) {
-							const newValue = self.ltr ? self.min : self.max;
-							self.#updatePosition(newValue, i);
-						} else if (self.ltr && thumbValue > self.min) {
-							self.#updatePosition(thumbValue - self.step, i);
-						} else if (self.rtl && thumbValue < self.max) {
-							self.#updatePosition(thumbValue + self.step, i);
-						}
-
-						break;
-					}
-					case kbd.ARROW_RIGHT: {
-						if (!self.horizontal) break;
-
-						e.preventDefault();
-
-						if (e.metaKey) {
-							const newValue = self.ltr ? self.max : self.min;
-							self.#updatePosition(newValue, i);
-						} else if (self.ltr && thumbValue < self.max) {
-							self.#updatePosition(thumbValue + self.step, i);
-						} else if (self.rtl && thumbValue > self.min) {
-							self.#updatePosition(thumbValue - self.step, i);
-						}
-
-						break;
-					}
-					case kbd.ARROW_UP: {
-						e.preventDefault();
-
-						const topToBottom = self.vertical && self.rtl;
-						if (e.metaKey) {
-							const newValue = topToBottom ? self.min : self.max;
-							self.#updatePosition(newValue, i);
-						} else if (topToBottom && thumbValue > self.min) {
-							self.#updatePosition(thumbValue - self.step, i);
-						} else if (!topToBottom && thumbValue < self.max) {
-							self.#updatePosition(thumbValue + self.step, i);
-						}
-
-						break;
-					}
-					case kbd.ARROW_DOWN: {
-						e.preventDefault();
-
-						const topToBottom = self.vertical && self.rtl;
-						if (e.metaKey) {
-							const newValue = topToBottom ? self.max : self.min;
-							self.#updatePosition(newValue, i);
-						} else if (topToBottom && thumbValue < self.max) {
-							self.#updatePosition(thumbValue + self.step, i);
-						} else if (!topToBottom && thumbValue > self.min) {
-							self.#updatePosition(thumbValue - self.step, i);
-						}
-
-						break;
-					}
-				}
+					return styleToString(style);
+				},
+				"data-value": () => thumbValue,
+			},
+			on: {
+				keydown: (e) => this.#handleThumbKeyDown(e, i, thumbValue),
 			},
 		});
+	}
+
+	#handleThumbKeyDown(e: HTMLElementEvent<"keydown">, i: number, thumbValue: number) {
+		if (this.disabled) return;
+		switch (e.key) {
+			case kbd.HOME: {
+				e.preventDefault();
+				this.#updatePosition(this.min, i);
+				break;
+			}
+			case kbd.END: {
+				e.preventDefault();
+				this.#updatePosition(this.max, i);
+				break;
+			}
+			case kbd.ARROW_LEFT: {
+				if (!this.horizontal) break;
+
+				e.preventDefault();
+
+				if (e.metaKey) {
+					const newValue = this.ltr ? this.min : this.max;
+					this.#updatePosition(newValue, i);
+				} else if (this.ltr && thumbValue > this.min) {
+					this.#updatePosition(thumbValue - this.step, i);
+				} else if (this.rtl && thumbValue < this.max) {
+					this.#updatePosition(thumbValue + this.step, i);
+				}
+
+				break;
+			}
+			case kbd.ARROW_RIGHT: {
+				if (!this.horizontal) break;
+
+				e.preventDefault();
+
+				if (e.metaKey) {
+					const newValue = this.ltr ? this.max : this.min;
+					this.#updatePosition(newValue, i);
+				} else if (this.ltr && thumbValue < this.max) {
+					this.#updatePosition(thumbValue + this.step, i);
+				} else if (this.rtl && thumbValue > this.min) {
+					this.#updatePosition(thumbValue - this.step, i);
+				}
+
+				break;
+			}
+			case kbd.ARROW_UP: {
+				e.preventDefault();
+
+				const topToBottom = this.vertical && this.rtl;
+				if (e.metaKey) {
+					const newValue = topToBottom ? this.min : this.max;
+					this.#updatePosition(newValue, i);
+				} else if (topToBottom && thumbValue > this.min) {
+					this.#updatePosition(thumbValue - this.step, i);
+				} else if (!topToBottom && thumbValue < this.max) {
+					this.#updatePosition(thumbValue + this.step, i);
+				}
+
+				break;
+			}
+			case kbd.ARROW_DOWN: {
+				e.preventDefault();
+
+				const topToBottom = this.vertical && this.rtl;
+				if (e.metaKey) {
+					const newValue = topToBottom ? this.max : this.min;
+					this.#updatePosition(newValue, i);
+				} else if (topToBottom && thumbValue < this.max) {
+					this.#updatePosition(thumbValue + this.step, i);
+				} else if (!topToBottom && thumbValue > this.min) {
+					this.#updatePosition(thumbValue - this.step, i);
+				}
+
+				break;
+			}
+		}
 	}
 
 	ticks() {
@@ -416,47 +402,46 @@ export class Slider {
 	}
 
 	#tick(i: number, count: number) {
-		const self = this;
-		const tickValue = $derived(self.min + i * self.step);
+		const tickValue = $derived(this.min + i * this.step);
 		return element(ELEMENTS.tick, {
-			get style() {
-				const style: StyleObject = {
-					position: "absolute",
-				};
+			props: {
+				style: () => {
+					const style: StyleObject = {
+						position: "absolute",
+					};
 
-				// The track is divided into sections of ratio `step / (max - min)`
-				const tickPosition = i * (self.step / (self.max - self.min)) * 100;
+					// The track is divided into sections of ratio `step / (max - min)`
+					const tickPosition = i * (this.step / (this.max - this.min)) * 100;
 
-				// Offset each tick by -50% to center it, except the first and last ticks.
-				// The first tick is already positioned at the start of the slider.
-				// The last tick is offset by -100% to prevent it from being rendered outside.
-				const isFirst = i === 0;
-				const isLast = i === count - 1;
-				const offsetPercentage = isFirst ? 0 : isLast ? -100 : -50;
+					// Offset each tick by -50% to center it, except the first and last ticks.
+					// The first tick is already positioned at the start of the slider.
+					// The last tick is offset by -100% to prevent it from being rendered outside.
+					const isFirst = i === 0;
+					const isLast = i === count - 1;
+					const offsetPercentage = isFirst ? 0 : isLast ? -100 : -50;
 
-				if (self.horizontal) {
-					const direction = self.ltr ? "left" : "right";
-					style[direction] = `${tickPosition}%`;
-					style.translate = self.ltr ? `${offsetPercentage}% 0` : `${-offsetPercentage}% 0`;
-				} else {
-					const direction = self.ltr ? "bottom" : "top";
-					style[direction] = `${tickPosition}%`;
-					style.translate = self.ltr ? `0 ${-offsetPercentage}%` : `0 ${offsetPercentage}%`;
-				}
+					if (this.horizontal) {
+						const direction = this.ltr ? "left" : "right";
+						style[direction] = `${tickPosition}%`;
+						style.translate = this.ltr ? `${offsetPercentage}% 0` : `${-offsetPercentage}% 0`;
+					} else {
+						const direction = this.ltr ? "bottom" : "top";
+						style[direction] = `${tickPosition}%`;
+						style.translate = this.ltr ? `0 ${-offsetPercentage}%` : `0 ${offsetPercentage}%`;
+					}
 
-				return styleToString(style);
-			},
-			get "data-bounded"() {
-				if (self.value.length === 0) {
-					return undefined;
-				}
-				if (self.value.length === 1) {
-					return booleanAttr(tickValue <= self.value[0]!);
-				}
-				return booleanAttr(self.value[0]! <= tickValue && tickValue <= self.value.at(-1)!);
-			},
-			get "data-value"() {
-				return tickValue;
+					return styleToString(style);
+				},
+				"data-bounded": () => {
+					if (this.value.length === 0) {
+						return undefined;
+					}
+					if (this.value.length === 1) {
+						return booleanAttr(tickValue <= this.value[0]!);
+					}
+					return booleanAttr(this.value[0]! <= tickValue && tickValue <= this.value.at(-1)!);
+				},
+				"data-value": () => tickValue,
 			},
 		});
 	}
@@ -467,19 +452,44 @@ export class Slider {
 			if (this.disabled) return;
 
 			$effect(() => {
-				return addEventListener(document, "pointermove", this.#handleDocumentPointerMove);
+				return addEventListener(
+					document,
+					"pointermove",
+					this.#handleDocumentPointerMove.bind(this),
+				);
 			});
 
 			$effect(() => {
-				return addEventListener(document, "pointerdown", this.#handleDocumentPointerDown);
+				return addEventListener(document, "pointerdown", (e) => {
+					if (e.button !== 0) return;
+
+					const sliderEl = document.getElementById(this.rootId);
+					const closestThumb = this.#getClosestThumb(e);
+					if (closestThumb === null || sliderEl === null) return;
+
+					const target = e.target;
+					if (!isHTMLElement(target) || !sliderEl.contains(target)) return;
+
+					e.preventDefault();
+
+					this.#activeThumb = closestThumb;
+					closestThumb.el.focus();
+					this.#isActive = true;
+
+					this.#handleDocumentPointerMove(e);
+				});
 			});
 
 			$effect(() => {
-				return addEventListener(document, "pointerup", this.#handleDocumentPointerUpOrLeave);
+				return addEventListener(document, "pointerup", () => {
+					this.#isActive = false;
+				});
 			});
 
 			$effect(() => {
-				return addEventListener(document, "pointerleave", this.#handleDocumentPointerUpOrLeave);
+				return addEventListener(document, "pointerleave", () => {
+					this.#isActive = false;
+				});
 			});
 		});
 
@@ -494,7 +504,7 @@ export class Slider {
 		});
 	});
 
-	readonly #handleDocumentPointerMove = (e: PointerEvent) => {
+	#handleDocumentPointerMove(e: PointerEvent) {
 		if (!this.#isActive) return;
 
 		e.preventDefault();
@@ -515,28 +525,5 @@ export class Slider {
 			const end = this.ltr ? top : bottom;
 			this.#applyPosition(e.clientY, this.#activeThumb.index, start, end);
 		}
-	};
-
-	readonly #handleDocumentPointerDown = (e: PointerEvent) => {
-		if (e.button !== 0) return;
-
-		const sliderEl = document.getElementById(this.rootId);
-		const closestThumb = this.#getClosestThumb(e);
-		if (closestThumb === null || sliderEl === null) return;
-
-		const target = e.target;
-		if (!isHTMLElement(target) || !sliderEl.contains(target)) return;
-
-		e.preventDefault();
-
-		this.#activeThumb = closestThumb;
-		closestThumb.el.focus();
-		this.#isActive = true;
-
-		this.#handleDocumentPointerMove(e);
-	};
-
-	readonly #handleDocumentPointerUpOrLeave = () => {
-		this.#isActive = false;
-	};
+	}
 }
