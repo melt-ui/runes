@@ -392,6 +392,75 @@ export class Slider {
 		});
 	}
 
+	ticks() {
+		const difference = this.max - this.min;
+
+		// min = 0, max = 8, step = 3:
+		// ----------------------------
+		// 0, 3, 6
+		// (8 - 0) / 3 = 2.666... = 3 ceiled
+		let count = Math.ceil(difference / this.step);
+
+		// min = 0, max = 9, step = 3:
+		// ---------------------------
+		// 0, 3, 6, 9
+		// (9 - 0) / 3 = 3
+		// We need to add 1 because `difference` is a multiple of `step`.
+		if (difference % this.step == 0) {
+			count++;
+		}
+
+		return Array(count)
+			.fill(null)
+			.map((_, i) => this.#tick(i, count));
+	}
+
+	#tick(i: number, count: number) {
+		const self = this;
+		const tickValue = $derived(self.min + i * self.step);
+		return element(ELEMENTS.tick, {
+			get style() {
+				const style: StyleObject = {
+					position: "absolute",
+				};
+
+				// The track is divided into sections of ratio `step / (max - min)`
+				const tickPosition = i * (self.step / (self.max - self.min)) * 100;
+
+				// Offset each tick by -50% to center it, except the first and last ticks.
+				// The first tick is already positioned at the start of the slider.
+				// The last tick is offset by -100% to prevent it from being rendered outside.
+				const isFirst = i === 0;
+				const isLast = i === count - 1;
+				const offsetPercentage = isFirst ? 0 : isLast ? -100 : -50;
+
+				if (self.horizontal) {
+					const direction = self.ltr ? "left" : "right";
+					style[direction] = `${tickPosition}%`;
+					style.translate = self.ltr ? `${offsetPercentage}% 0` : `${-offsetPercentage}% 0`;
+				} else {
+					const direction = self.ltr ? "bottom" : "top";
+					style[direction] = `${tickPosition}%`;
+					style.translate = self.ltr ? `0 ${-offsetPercentage}%` : `0 ${offsetPercentage}%`;
+				}
+
+				return styleToString(style);
+			},
+			get "data-bounded"() {
+				if (self.value.length === 0) {
+					return undefined;
+				}
+				if (self.value.length === 1) {
+					return booleanAttr(tickValue <= self.value[0]!);
+				}
+				return booleanAttr(self.value[0]! <= tickValue && tickValue <= self.value.at(-1)!);
+			},
+			get "data-value"() {
+				return tickValue;
+			},
+		});
+	}
+
 	// Effects
 	readonly destroy = autoDestroyEffectRoot(() => {
 		$effect(() => {
