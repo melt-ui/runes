@@ -24,6 +24,12 @@ import {
 } from "$lib/internal/helpers/index.js";
 import type { TooltipProps } from "./types.js";
 
+const ELEMENTS = {
+	trigger: "tooltip-trigger",
+	content: "tooltip-content",
+	arrow: "tooltip-arrow",
+} as const;
+
 // Store a global map to get the currently open tooltip in a given group.
 const openTooltips = new Map<string | true, Tooltip>();
 
@@ -196,12 +202,12 @@ export class Tooltip {
 	// Elements
 	trigger() {
 		const self = this;
-		return element("tooltip-trigger", {
-			get "aria-describedby"() {
-				return self.contentId;
-			},
+		return element(ELEMENTS.trigger, {
 			get id() {
 				return self.triggerId;
+			},
+			get "aria-describedby"() {
+				return self.contentId;
 			},
 			onpointerdown() {
 				if (!self.closeOnPointerDown) return;
@@ -223,29 +229,29 @@ export class Tooltip {
 			onblur() {
 				self.#closeTooltip(true);
 			},
-			onkeydown: self.#handleKeyDown.bind(self),
+			onkeydown: self.#handleKeyDown,
 		});
 	}
 
-	#handleKeyDown(e: KeyboardEvent) {
+	readonly #handleKeyDown = (e: KeyboardEvent) => {
 		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
 			this.open = false;
 		}
-	}
+	};
 
 	content() {
 		const self = this;
-		return element("tooltip-content", {
+		return element(ELEMENTS.content, {
 			role: "tooltip",
 			tabindex: -1,
+			get id() {
+				return self.contentId;
+			},
 			get hidden() {
 				return booleanAttr(self.#hidden);
 			},
 			get style() {
 				return self.#hidden ? "display: none;" : undefined;
-			},
-			get id() {
-				return self.contentId;
 			},
 			get "data-portal"() {
 				return self.portal !== null ? "" : undefined;
@@ -261,7 +267,7 @@ export class Tooltip {
 
 	arrow() {
 		const self = this;
-		return element("tooltip-arrow", {
+		return element(ELEMENTS.arrow, {
 			"data-arrow": true,
 			get style() {
 				const size = `var(--arrow-size, ${self.arrowSize}px)`;
@@ -303,32 +309,11 @@ export class Tooltip {
 
 		$effect(() => {
 			if (!this.open) return;
-			return addEventListener(document, "mousemove", (e) => {
-				const triggerEl = document.getElementById(this.triggerId);
-				const contentEl = document.getElementById(this.contentId);
-				if (triggerEl === null || contentEl === null) return;
-
-				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
-				const polygon = makeHullFromElements(polygonElements);
-
-				this.#isMouseInTooltipArea = pointInPolygon(
-					{
-						x: e.clientX,
-						y: e.clientY,
-					},
-					polygon,
-				);
-
-				if (this.#openReason !== "pointer") return;
-
-				if (!this.#isMouseInTooltipArea) {
-					this.#closeTooltip();
-				}
-			});
+			return addEventListener(document, "mousemove", this.#handleDocumentMouseMove);
 		});
 
 		$effect(() => {
-			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
+			return addEventListener(document, "keydown", this.#handleKeyDown);
 		});
 
 		let unsubFloating = noop;
@@ -364,4 +349,27 @@ export class Tooltip {
 			unsubPortal();
 		};
 	});
+
+	readonly #handleDocumentMouseMove = (e: MouseEvent) => {
+		const triggerEl = document.getElementById(this.triggerId);
+		const contentEl = document.getElementById(this.contentId);
+		if (triggerEl === null || contentEl === null) return;
+
+		const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
+		const polygon = makeHullFromElements(polygonElements);
+
+		this.#isMouseInTooltipArea = pointInPolygon(
+			{
+				x: e.clientX,
+				y: e.clientY,
+			},
+			polygon,
+		);
+
+		if (this.#openReason !== "pointer") return;
+
+		if (!this.#isMouseInTooltipArea) {
+			this.#closeTooltip();
+		}
+	};
 }

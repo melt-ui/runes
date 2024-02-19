@@ -9,6 +9,10 @@ import {
 } from "$lib/internal/helpers/index.js";
 import type { ToggleProps } from "./types.js";
 
+const ELEMENTS = {
+	root: "toggle",
+} as const;
+
 export class Toggle {
 	#pressedBox: WritableBox<boolean>;
 	#disabledBox: ReadableBox<boolean>;
@@ -33,8 +37,11 @@ export class Toggle {
 
 	root() {
 		const self = this;
-		return element("toggle", {
+		return element(ELEMENTS.root, {
 			type: "button",
+			get "aria-pressed"() {
+				return self.pressed;
+			},
 			get disabled() {
 				return booleanAttr(self.disabled);
 			},
@@ -43,9 +50,6 @@ export class Toggle {
 			},
 			get "data-state"() {
 				return self.pressed ? "on" : "off";
-			},
-			get "aria-pressed"() {
-				return self.pressed;
 			},
 			onclick() {
 				if (self.disabled) return;

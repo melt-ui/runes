@@ -80,7 +80,7 @@ export type TooltipProps = {
 
 	/**
 	 * If not `undefined`, the tooltip will be rendered within the provided element or selector.
-	 * 
+	 *
 	 * If `null`, the element won't portal.
 	 *
 	 * @default 'body'
