@@ -7,14 +7,22 @@ export function element<
 >(name: Name, props?: Props): Element<Name, Props>;
 
 export function element(name: string, props: HTMLAttributes<HTMLElement> = {}) {
-	props[`data-melt-${name}`] = "";
+	props[dataMelt(name)] = "";
 	return props;
 }
 
 export type DataMeltProp<Name extends string> = {
-	[K in Name]: Record<`data-melt-${K}`, "">;
+	[N in Name]: Record<`data-melt-${N}`, "">;
 }[Name];
 
 export type Element<Name extends string, Props extends HTMLAttributes<HTMLElement>> = Prettify<
 	Readonly<DataMeltProp<Name> & Props>
 >;
+
+export function dataMelt<const Name extends string>(name: Name) {
+	return `data-melt-${name}` as const;
+}
+
+export function dataMeltSelector<const Name extends string>(name: Name) {
+	return `[data-melt-${name}]` as const;
+}
