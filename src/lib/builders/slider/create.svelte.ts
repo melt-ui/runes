@@ -214,7 +214,7 @@ export class Slider {
 	// Elements
 	root() {
 		return element(ELEMENTS.root, {
-			props: {
+			derived: {
 				id: () => this.rootId,
 				dir: () => this.dir,
 				disabled: () => booleanAttr(this.disabled),
@@ -232,7 +232,7 @@ export class Slider {
 
 	range() {
 		return element(ELEMENTS.range, {
-			props: {
+			derived: {
 				style: () => {
 					const style: StyleObject = {
 						position: "absolute",
@@ -266,6 +266,8 @@ export class Slider {
 		return element(ELEMENTS.thumb, {
 			props: {
 				role: "slider",
+			},
+			derived: {
 				"aria-valuemin": () => this.min,
 				"aria-valuemax": () => this.max,
 				"aria-valuenow": () => thumbValue,
@@ -404,7 +406,7 @@ export class Slider {
 	#tick(i: number, count: number) {
 		const tickValue = $derived(this.min + i * this.step);
 		return element(ELEMENTS.tick, {
-			props: {
+			derived: {
 				style: () => {
 					const style: StyleObject = {
 						position: "absolute",

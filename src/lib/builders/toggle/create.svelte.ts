@@ -39,6 +39,8 @@ export class Toggle {
 		return element(ELEMENTS.root, {
 			props: {
 				type: "button",
+			},
+			derived: {
 				"aria-pressed": () => this.pressed,
 				disabled: () => booleanAttr(this.disabled),
 				"data-disabled": () => booleanAttr(this.disabled),

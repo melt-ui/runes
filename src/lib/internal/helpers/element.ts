@@ -10,9 +10,16 @@ export type HTMLElementEvent<EventName extends HTMLElementEventName> =
 		currentTarget: HTMLElement;
 	};
 
-export type ElementArgs<Props extends HTMLElementProps, EventName extends HTMLElementEventName> = {
+export type ElementArgs<
+	Props extends HTMLElementProps,
+	DerivedProps extends HTMLElementProps,
+	EventName extends HTMLElementEventName,
+> = {
 	props?: {
-		[K in keyof Props]: Props[K] | Getter<Props[K]>;
+		[K in keyof Props]: Props[K];
+	};
+	derived?: {
+		[K in keyof DerivedProps]: Getter<DerivedProps[K]>;
 	};
 	on?: {
 		[E in EventName]: (event: HTMLElementEvent<E>) => void;
@@ -22,13 +29,12 @@ export type ElementArgs<Props extends HTMLElementProps, EventName extends HTMLEl
 export function element<
 	const Name extends string,
 	const Props extends HTMLElementProps = Record<never, never>,
+	const DerivedProps extends HTMLElementProps = Record<never, never>,
 	const EventName extends HTMLElementEventName = never,
->(name: Name, args?: ElementArgs<Props, EventName>): Element<Name, Props, EventName>;
-
-export function element(
-	name: string,
-	{ props, on }: ElementArgs<HTMLElementProps, HTMLElementEventName> = {},
-) {
+>(
+	name: Name,
+	{ props, derived, on }: ElementArgs<Props, DerivedProps, EventName> = {},
+): Element<Name, Props, DerivedProps, EventName> {
 	const result = {};
 
 	Object.defineProperty(result, dataMelt(name), {
@@ -37,35 +43,35 @@ export function element(
 	});
 
 	for (const key in props) {
-		const value = props[key as keyof typeof props];
-		if (typeof value === "function") {
-			Object.defineProperty(result, key, {
-				get: value,
-				enumerable: true,
-			});
-		} else {
-			Object.defineProperty(result, key, {
-				value,
-				enumerable: true,
-			});
-		}
-	}
-
-	for (const key in on) {
-		Object.defineProperty(result, `on${key}`, {
-			value: on[key as keyof typeof on],
+		Object.defineProperty(result, key, {
+			value: props[key],
 			enumerable: true,
 		});
 	}
 
-	return result;
+	for (const key in derived) {
+		Object.defineProperty(result, key, {
+			get: derived[key],
+			enumerable: true,
+		});
+	}
+
+	for (const key in on) {
+		Object.defineProperty(result, `on${key}`, {
+			value: on[key],
+			enumerable: true,
+		});
+	}
+
+	return result as Element<Name, Props, DerivedProps, EventName>;
 }
 
 export type Element<
 	Name extends string,
 	Props extends HTMLElementProps,
+	DerviedProps extends HTMLElementProps,
 	EventName extends HTMLElementEventName,
-> = Prettify<Readonly<DataMeltProp<Name> & Props & EventHandlerProps<EventName>>>;
+> = Prettify<Readonly<DataMeltProp<Name> & Props & DerviedProps & EventHandlerProps<EventName>>>;
 
 type DataMeltProp<Name extends string> = {
 	[N in Name]: Record<`data-melt-${N}`, "">;

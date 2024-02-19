@@ -202,7 +202,7 @@ export class Tooltip {
 	// Elements
 	trigger() {
 		return element(ELEMENTS.trigger, {
-			props: {
+			derived: {
 				id: () => this.triggerId,
 				"aria-describedby": () => this.contentId,
 			},
@@ -243,6 +243,8 @@ export class Tooltip {
 			props: {
 				role: "tooltip",
 				tabindex: -1,
+			},
+			derived: {
 				id: () => this.contentId,
 				hidden: () => booleanAttr(this.#hidden),
 				style: () => {
@@ -269,6 +271,8 @@ export class Tooltip {
 		return element(ELEMENTS.arrow, {
 			props: {
 				"data-arrow": true,
+			},
+			derived: {
 				style: () => {
 					const size = `var(--arrow-size, ${this.arrowSize}px)`;
 					return styleToString({
