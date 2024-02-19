@@ -20,21 +20,21 @@ export type SliderProps = {
 	 *
 	 * @default 0
 	 */
-	min?: number;
+	min?: ReadableProp<number>;
 
 	/**
 	 * The maximum value of the slider.
 	 *
 	 * @default 100
 	 */
-	max?: number;
+	max?: ReadableProp<number>;
 
 	/**
 	 * The amount to increment or decrement the value of the slider.
 	 *
 	 * @default 1
 	 */
-	step?: number;
+	step?: ReadableProp<number>;
 
 	/**
 	 * The orientation of the slider.
@@ -63,5 +63,5 @@ export type SliderProps = {
 	/**
 	 * Optionally override the default ids we assign to the root element.
 	 */
-	rootId?: string;
+	rootId?: ReadableProp<string>;
 };
