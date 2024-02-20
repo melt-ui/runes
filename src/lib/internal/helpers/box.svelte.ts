@@ -3,7 +3,7 @@ import type { Getter, Setter } from "../types.js";
 export type ReadableBox<T> = { readonly value: T };
 export type WritableBox<T> = { value: T };
 
-export class DerivedBox<T> implements ReadableBox<T> {
+export class DerivedBox<T> implements WritableBox<T> {
 	constructor(
 		private readonly get: Getter<T>,
 		private readonly set?: Setter<T>,
