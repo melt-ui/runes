@@ -240,7 +240,7 @@ export class Tooltip {
 
 	content() {
 		return element(ELEMENTS.content, {
-			props: {
+			static: {
 				role: "tooltip",
 				tabindex: -1,
 			},
@@ -269,7 +269,7 @@ export class Tooltip {
 
 	arrow() {
 		return element(ELEMENTS.arrow, {
-			props: {
+			static: {
 				"data-arrow": true,
 			},
 			derived: {

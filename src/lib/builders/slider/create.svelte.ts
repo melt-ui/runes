@@ -264,7 +264,7 @@ export class Slider {
 	#thumb(i: number) {
 		const thumbValue = $derived(this.value[i] || this.min);
 		return element(ELEMENTS.thumb, {
-			props: {
+			static: {
 				role: "slider",
 			},
 			derived: {

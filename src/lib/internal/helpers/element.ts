@@ -10,13 +10,13 @@ export type HTMLElementEvent<EventName extends HTMLElementEventName> =
 		currentTarget: HTMLElement;
 	};
 
-export type ElementArgs<
-	Props extends HTMLElementProps,
+export type ElementProps<
+	StaticProps extends HTMLElementProps,
 	DerivedProps extends HTMLElementProps,
 	EventName extends HTMLElementEventName,
 > = {
-	props?: {
-		[K in keyof Props]: Props[K];
+	static?: {
+		[K in keyof StaticProps]: StaticProps[K];
 	};
 	derived?: {
 		[K in keyof DerivedProps]: Getter<DerivedProps[K]>;
@@ -28,13 +28,13 @@ export type ElementArgs<
 
 export function element<
 	const Name extends string,
-	const Props extends HTMLElementProps = Record<never, never>,
+	const StaticProps extends HTMLElementProps = Record<never, never>,
 	const DerivedProps extends HTMLElementProps = Record<never, never>,
 	const EventName extends HTMLElementEventName = never,
 >(
 	name: Name,
-	{ props, derived, on }: ElementArgs<Props, DerivedProps, EventName> = {},
-): Element<Name, Props, DerivedProps, EventName> {
+	props: ElementProps<StaticProps, DerivedProps, EventName> = {},
+): Element<Name, StaticProps, DerivedProps, EventName> {
 	const result = {};
 
 	Object.defineProperty(result, dataMelt(name), {
@@ -42,36 +42,38 @@ export function element<
 		enumerable: true,
 	});
 
-	for (const key in props) {
+	for (const key in props.static) {
 		Object.defineProperty(result, key, {
-			value: props[key],
+			value: props.static[key],
 			enumerable: true,
 		});
 	}
 
-	for (const key in derived) {
+	for (const key in props.derived) {
 		Object.defineProperty(result, key, {
-			get: derived[key],
+			get: props.derived[key],
 			enumerable: true,
 		});
 	}
 
-	for (const key in on) {
+	for (const key in props.on) {
 		Object.defineProperty(result, `on${key}`, {
-			value: on[key],
+			value: props.on[key],
 			enumerable: true,
 		});
 	}
 
-	return result as Element<Name, Props, DerivedProps, EventName>;
+	return result as Element<Name, StaticProps, DerivedProps, EventName>;
 }
 
 export type Element<
 	Name extends string,
-	Props extends HTMLElementProps,
-	DerviedProps extends HTMLElementProps,
+	StaticProps extends HTMLElementProps,
+	DerivedProps extends HTMLElementProps,
 	EventName extends HTMLElementEventName,
-> = Prettify<Readonly<DataMeltProp<Name> & Props & DerviedProps & EventHandlerProps<EventName>>>;
+> = Prettify<
+	Readonly<DataMeltProp<Name> & StaticProps & DerivedProps & EventHandlerProps<EventName>>
+>;
 
 type DataMeltProp<Name extends string> = {
 	[N in Name]: Record<`data-melt-${N}`, "">;

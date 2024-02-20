@@ -37,7 +37,7 @@ export class Toggle {
 
 	root() {
 		return element(ELEMENTS.root, {
-			props: {
+			static: {
 				type: "button",
 			},
 			derived: {
