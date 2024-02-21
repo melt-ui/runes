@@ -64,3 +64,10 @@ export const RTL: StoryObj<SliderPreview> = {
 		dir: "rtl",
 	},
 };
+
+export const VerticalRTL: StoryObj<SliderPreview> = {
+	args: {
+		orientation: "vertical",
+		dir: "rtl",
+	},
+};
