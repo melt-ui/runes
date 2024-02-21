@@ -1,7 +1,8 @@
 <script lang="ts">
 	import { Slider, type SliderDirection, type SliderOrientation } from "$lib/index.js";
 
-	let { min, max, step, orientation, dir, disabled, ticks } = $props<{
+	let { value, min, max, step, orientation, dir, disabled, ticks } = $props<{
+		value: number[];
 		min: number;
 		max: number;
 		step: number;
@@ -10,8 +11,6 @@
 		disabled: boolean;
 		ticks: boolean;
 	}>();
-
-	const value = $state([]);
 
 	const slider = new Slider({
 		value: () => value,

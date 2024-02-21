@@ -4,6 +4,7 @@ import SliderPreview from "./SliderPreview.svelte";
 const meta = {
 	component: SliderPreview,
 	args: {
+		value: [],
 		min: 0,
 		max: 100,
 		step: 1,
@@ -43,6 +44,12 @@ const meta = {
 export default meta;
 
 export const Default: StoryObj<SliderPreview> = {};
+
+export const Range: StoryObj<SliderPreview> = {
+	args: {
+		value: [25, 75],
+	},
+};
 
 export const Ticks: StoryObj<SliderPreview> = {
 	args: {
