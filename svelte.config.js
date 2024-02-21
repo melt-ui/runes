@@ -6,6 +6,15 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
+		alias: {
+			$components: "./src/components",
+		},
+	},
+	compilerOptions: {
+		legacy: {
+			// Required for Storybook
+			componentApi: true,
+		},
 	},
 };
 

@@ -1,10 +1,11 @@
-/** @type { import("eslint").Linter.Config } */
+/** @type {import("eslint").Linter.Config} */
 module.exports = {
 	root: true,
 	extends: [
 		"eslint:recommended",
 		"plugin:@typescript-eslint/recommended",
 		"plugin:svelte/recommended",
+		"plugin:storybook/recommended",
 		"prettier",
 	],
 	parser: "@typescript-eslint/parser",

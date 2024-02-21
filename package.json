@@ -10,7 +10,9 @@
 		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
 		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
 		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
+		"format": "prettier --write .",
+		"storybook": "storybook dev -p 6006",
+		"build-storybook": "storybook build"
 	},
 	"exports": {
 		".": {
@@ -27,6 +29,13 @@
 		"svelte": "^4.0.0"
 	},
 	"devDependencies": {
+		"@storybook/addon-essentials": "^7.6.17",
+		"@storybook/addon-interactions": "^7.6.17",
+		"@storybook/addon-links": "^7.6.17",
+		"@storybook/blocks": "^7.6.17",
+		"@storybook/svelte": "^7.6.17",
+		"@storybook/sveltekit": "^7.6.17",
+		"@storybook/test": "^7.6.17",
 		"@sveltejs/adapter-auto": "^3.0.1",
 		"@sveltejs/kit": "^2.0.6",
 		"@sveltejs/package": "^2.2.5",
@@ -38,15 +47,20 @@
 		"autoprefixer": "^10.4.16",
 		"eslint": "^8.56.0",
 		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "2.36.0-next.3",
+		"eslint-plugin-storybook": "^0.8.0",
+		"eslint-plugin-svelte": "2.36.0-next.5",
+		"lucide-svelte": "^0.335.0",
 		"postcss": "^8.4.32",
 		"postcss-load-config": "^5.0.2",
 		"prettier": "^3.1.1",
-		"prettier-plugin-svelte": "^3.1.2",
+		"prettier-plugin-svelte": "^3.2.1",
 		"prettier-plugin-tailwindcss": "^0.5.10",
 		"publint": "^0.2.7",
+		"react": "^18.2.0",
+		"react-dom": "^18.2.0",
+		"storybook": "^7.6.17",
 		"svelte": "5.0.0-next.59",
-		"svelte-check": "^3.6.2",
+		"svelte-check": "^3.6.4",
 		"tailwindcss": "^3.4.0",
 		"tslib": "^2.6.2",
 		"typescript": "^5.3.3",
