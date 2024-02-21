@@ -59,4 +59,4 @@ const meta = {
 
 export default meta;
 
-export const Default: StoryObj<TooltipPreview> = {};
+export const Tooltip: StoryObj<TooltipPreview> = {};
