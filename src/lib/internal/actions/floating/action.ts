@@ -2,6 +2,7 @@
 // Source: https://github.com/grail-ui/grail-ui
 // https://github.com/grail-ui/grail-ui/tree/master/packages/grail-ui/src/floating/placement.ts
 
+import { isHTMLElement, noop } from "$lib/internal/helpers/index.js";
 import type { VirtualElement } from "@floating-ui/core";
 import {
 	arrow,
@@ -13,7 +14,6 @@ import {
 	size,
 	type Middleware,
 } from "@floating-ui/dom";
-import { isHTMLElement, noop } from "$lib/internal/helpers/index.js";
 import type { FloatingConfig } from "./types.js";
 
 const defaultConfig = {
@@ -33,16 +33,15 @@ const ARROW_TRANSFORM = {
 };
 
 export function useFloating(
-	reference: HTMLElement | VirtualElement | undefined,
-	floating: HTMLElement | undefined,
-	opts: FloatingConfig = {},
+	reference: HTMLElement | VirtualElement,
+	floating: HTMLElement,
+	config: FloatingConfig | null = {},
 ) {
-	if (!floating || !reference || opts === null)
-		return {
-			destroy: noop,
-		};
+	if (config === null) {
+		return { destroy: noop };
+	}
 
-	const options = { ...defaultConfig, ...opts };
+	const options = { ...defaultConfig, ...config } satisfies FloatingConfig;
 
 	const arrowEl = floating.querySelector("[data-arrow=true]");
 	const middleware: Middleware[] = [];
@@ -99,7 +98,6 @@ export function useFloating(
 	);
 
 	function compute() {
-		if (!reference || !floating) return;
 		const { placement, strategy } = options;
 
 		computePosition(reference, floating, {

@@ -1,7 +1,17 @@
-import type { ChangeFn } from "$lib/internal/types";
+import type { ReadableProp, WritableProp } from "$lib/internal/helpers/index.js";
 
 export type ToggleProps = {
-	pressed?: boolean;
-	onPressedChange?: ChangeFn<boolean>;
-	disabled?: boolean;
+	/**
+	 * Whether or not the toggle is pressed.
+	 *
+	 * @default false
+	 */
+	pressed?: WritableProp<boolean>;
+
+	/**
+	 * Whether or not the toggle is disabled.
+	 *
+	 * @default false
+	 */
+	disabled?: ReadableProp<boolean>;
 };

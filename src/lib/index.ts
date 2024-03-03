@@ -1,3 +1,3 @@
-export * from "./builders/label";
-export * from "./builders/toggle";
-export * from "./builders/tooltip";
+export * from "./builders/label/index.js";
+export * from "./builders/toggle/index.js";
+export * from "./builders/tooltip/index.js";

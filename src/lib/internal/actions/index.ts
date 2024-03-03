@@ -1,2 +1,2 @@
-export * from "./floating";
-export * from "./portal";
+export * from "./floating/index.js";
+export * from "./portal.js";

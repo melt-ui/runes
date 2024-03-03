@@ -1,27 +1,52 @@
 <script lang="ts">
-	import { Toggle } from "$lib";
+	import { Toggle } from "$lib/index.js";
 
-	const toggle = new Toggle({
-		onPressedChange: (pressed) => {
-			console.log("onPressedChange", pressed);
-			return pressed;
+	const uncontrolled = new Toggle();
+
+	let pressed = $state(false);
+	let disabled = $state(false);
+
+	const controlled = new Toggle({
+		pressed: {
+			get: () => pressed,
+			set: (v) => (pressed = v),
 		},
+		disabled: () => disabled,
 	});
 
-	$inspect(toggle.pressed, toggle.disabled);
+	$inspect("pressed", pressed);
+	$inspect("disabled", disabled);
 </script>
 
-<div class="flex gap-24">
-	<button {...toggle.root} class="btn">
-		{#if toggle.pressed}
-			On
-		{:else}
-			Off
-		{/if}
-	</button>
+<h1>Toggle</h1>
 
-	<div class="flex items-center gap-2">
-		<label for="disabled" class="select-none">Disabled</label>
-		<input id="disabled" type="checkbox" bind:checked={toggle.disabled} />
+<section>
+	<h2>Uncontrolled</h2>
+	<div>
+		<button {...uncontrolled.root()} class="btn">
+			{#if uncontrolled.pressed}
+				On
+			{:else}
+				Off
+			{/if}
+		</button>
 	</div>
-</div>
+</section>
+
+<hr class="my-8" />
+
+<section>
+	<h2>Controlled</h2>
+	<div class="flex items-center">
+		<button {...controlled.root()} class="btn">
+			{#if pressed}
+				On
+			{:else}
+				Off
+			{/if}
+		</button>
+
+		<label for="disabled" class="ml-auto select-none">Disabled</label>
+		<input id="disabled" type="checkbox" bind:checked={disabled} class="ml-2" />
+	</div>
+</section>
