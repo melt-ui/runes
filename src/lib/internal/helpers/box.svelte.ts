@@ -1,88 +1,48 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
-type Getter<T> = () => T;
-type Setter<T> = (value: T) => void;
+export type Box<T> = { value: T };
+export type ReadonlyBox<T> = Readonly<Box<T>>;
 
-export type Read<T> = [Getter<T>];
-export type Write<T> = [Getter<T>, Setter<T>];
+export type Getter<T> = () => T;
+export type Setter<T> = (value: T) => void;
 
-abstract class BaseBox<T> {
-	protected readonly getter: Getter<T>;
+class DerivedBox<T> implements Box<T> {
+	constructor(
+		readonly get: Getter<T>,
+		readonly set: Setter<T>,
+	) {}
 
-	constructor(getter: Getter<T>) {
-		this.getter = getter;
+	get value() {
+		return this.get();
 	}
 
-	abstract get value(): T;
-}
-
-class ReadBox<T> extends BaseBox<T> {
-	get value(): T {
-		return this.getter();
+	set value(v) {
+		this.set(v);
 	}
 }
 
-class WriteBox<T> extends BaseBox<T> {
-	private readonly setter: Setter<T>;
+class ReadonlyDerivedBox<T> implements ReadonlyBox<T> {
+	constructor(readonly get: Getter<T>) {}
 
-	constructor(getter: Getter<T>, setter: Setter<T>) {
-		super(getter);
-		this.setter = setter;
-	}
-
-	get value(): T {
-		return this.getter();
-	}
-
-	set value(v: T) {
-		this.setter(v);
+	get value() {
+		return this.get();
 	}
 }
 
-export function box<T>(getter: Getter<T>): ReadBox<T>;
-export function box<T>(getter: Getter<T>, setter: Setter<T>): WriteBox<T>;
-export function box(getter: any, setter?: any) {
-	if (setter) {
-		return new WriteBox(getter, setter);
+export type ReadableProp<T> = T | Getter<T>;
+export type WritableProp<T> = T | { get: Getter<T>; set: Setter<T> };
+
+export function readonlyBox<T>(value: ReadableProp<T>): ReadonlyBox<T> {
+	if (typeof value === "function") {
+		return new ReadonlyDerivedBox(value as Getter<T>);
 	} else {
-		return new ReadBox(getter);
+		return { value };
 	}
 }
 
-function boxFrom<T>(value: BoxOr<Write<T>>): Box<Write<T>>;
-function boxFrom<T>(value: Box<Write<T>>): Box<Write<T>>;
-function boxFrom<T>(value: BoxOr<Read<T>>): Box<Read<T>>;
-function boxFrom<T>(value: Box<Read<T>>): Box<Read<T>>;
-function boxFrom<T>(value: T): Box<Write<T>>;
-function boxFrom(value: unknown): unknown {
-	if (value instanceof BaseBox) {
-		return value;
+export function box<T>(value: WritableProp<T>): Box<T> {
+	if (value !== null && typeof value === "object" && "get" in value && "set" in value) {
+		return new DerivedBox(value.get.bind(value), value.set.bind(value));
+	} else {
+		const boxed = $state({ value });
+		return boxed;
 	}
-	let v = $state(value);
-
-	return box(
-		() => v,
-		(value) => (v = value),
-	);
 }
-
-box.from = boxFrom;
-
-export type Box<T extends Read<any> | Write<any>> = T extends Read<infer U>
-	? ReadBox<U>
-	: T extends Write<infer U>
-		? WriteBox<U>
-		: never;
-
-/* Utility functions and types */
-export type BoxOr<T extends Read<any> | Write<any>> = T extends Read<infer U>
-	? Box<Read<U>> | U
-	: T extends Write<infer U>
-		? Box<Write<U>> | U
-		: never;
-
-// eslint-disable-next-line @typescript-eslint/no-explicit-any
-export type BoxFrom<T extends BoxOr<any>> = T extends Box<Write<infer U>>
-	? Box<Write<U>>
-	: T extends Box<Read<infer U>>
-		? Box<Read<U>>
-		: Box<Write<T>>;

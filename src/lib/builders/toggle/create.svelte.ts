@@ -1,22 +1,15 @@
 import { disabledAttr, element, kbd } from "$lib/internal/helpers";
-import { box, type BoxFrom } from "$lib/internal/helpers/box.svelte";
-import { createMergeProps } from "$lib/internal/helpers/props";
+import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte";
 import type { ToggleProps } from "./types";
 
-const mergeProps = createMergeProps({
-	pressed: false,
-	disabled: false,
-});
-type Merged = ReturnType<typeof mergeProps<ToggleProps>>;
-
 export class Toggle {
-	#pressed: BoxFrom<Merged["pressed"]>;
-	#disabled: BoxFrom<Merged["disabled"]>;
+	#pressed: Box<boolean>;
+	#disabled: ReadonlyBox<boolean>;
 
 	constructor(props: ToggleProps = {}) {
-		const { pressed, disabled } = mergeProps(props);
-		this.#pressed = box.from(pressed);
-		this.#disabled = box.from(disabled);
+		const { pressed = false, disabled = false } = props;
+		this.#pressed = box(pressed);
+		this.#disabled = readonlyBox(disabled);
 	}
 
 	get pressed() {
@@ -70,8 +63,8 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	const _pressed = box.from(props.pressed ?? false);
-	const _disabled = box.from(props.disabled ?? false);
+	const _pressed = box(props.pressed ?? false);
+	const _disabled = readonlyBox(props.disabled ?? false);
 
 	const states = {
 		get pressed() {

@@ -9,7 +9,7 @@
 		forceVisible: true,
 	});
 
-	$inspect(tooltip.open);
+	$inspect("open", tooltip.open);
 </script>
 
 <button {...tooltip.trigger} class="btn">Trigger</button>
