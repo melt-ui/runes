@@ -1,21 +1,20 @@
 import type { HTMLAttributes } from "svelte/elements";
-import type { Prettify } from "../types";
+import type { Prettify } from "../types.js";
 
 export function element<
-	const TName extends string,
-	const TProps extends HTMLAttributes<HTMLElement> = Record<never, never>,
->(name: TName, props: TProps = {} as TProps) {
-	Object.defineProperty(props, `data-melt-${name}`, {
-		value: "",
-		enumerable: true,
-	});
-	return props as Element<TName, TProps>;
+	const Name extends string,
+	const Props extends HTMLAttributes<HTMLElement> = Record<never, never>,
+>(name: Name, props?: Props): Element<Name, Props>;
+
+export function element(name: string, props: HTMLAttributes<HTMLElement> = {}) {
+	props[`data-melt-${name}`] = "";
+	return props;
 }
 
-export type Element<TName extends string, TProps extends HTMLAttributes<HTMLElement>> = Prettify<
-	{
-		readonly [K in `data-melt-${TName}`]: "";
-	} & {
-		readonly [K in keyof TProps]: TProps[K];
-	}
+export type DataMeltProp<Name extends string> = {
+	[K in Name]: Record<`data-melt-${K}`, "">;
+}[Name];
+
+export type Element<Name extends string, Props extends HTMLAttributes<HTMLElement>> = Prettify<
+	Readonly<DataMeltProp<Name> & Props>
 >;

@@ -1,3 +1,5 @@
+import type { PropertiesHyphen as StyleObject } from "csstype";
+
 /**
  * A utility function that converts a style object to a string.
  *
@@ -6,9 +8,10 @@
  */
 export function styleToString(style: StyleObject): string {
 	return Object.keys(style).reduce((str, key) => {
-		if (style[key] === undefined) return str;
-		return str + `${key}:${style[key]};`;
+		const value = style[key as keyof StyleObject];
+		if (value === undefined) return str;
+		return str + `${key}:${value};`;
 	}, "");
 }
 
-export type StyleObject = Record<string, number | string | undefined>;
+export type { StyleObject };

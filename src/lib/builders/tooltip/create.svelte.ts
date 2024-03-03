@@ -1,8 +1,13 @@
-import { useFloating, usePortal, type FloatingConfig } from "$lib/internal/actions";
+import {
+	useFloating,
+	usePortal,
+	type FloatingConfig,
+	type PortalTarget,
+} from "$lib/internal/actions/index.js";
 import {
 	addEventListener,
-	autodisposable,
-	box,
+	autoDestroyEffectRoot,
+	booleanAttr,
 	element,
 	generateId,
 	getPortalDestination,
@@ -11,11 +16,12 @@ import {
 	makeHullFromElements,
 	noop,
 	pointInPolygon,
-	readonlyBox,
+	readableBox,
 	styleToString,
-	type Box,
-	type ReadonlyBox,
-} from "$lib/internal/helpers";
+	writableBox,
+	type ReadableBox,
+	type WritableBox,
+} from "$lib/internal/helpers/index.js";
 import type { TooltipProps } from "./types.js";
 
 // Store a global map to get the currently open tooltip in a given group.
@@ -24,19 +30,19 @@ const openTooltips = new Map<string | true, Tooltip>();
 type OpenReason = "pointer" | "focus";
 
 export class Tooltip {
-	#open: Box<boolean>;
-	#positioning: ReadonlyBox<FloatingConfig>;
-	#arrowSize: ReadonlyBox<number>;
-	#openDelay: ReadonlyBox<number>;
-	#closeDelay: ReadonlyBox<number>;
-	#closeOnPointerDown: ReadonlyBox<boolean>;
-	#closeOnEscape: ReadonlyBox<boolean>;
-	#forceVisible: ReadonlyBox<boolean>;
-	#disableHoverableContent: ReadonlyBox<boolean>;
-	#group: ReadonlyBox<string | boolean | undefined>;
-	#portal: ReadonlyBox<HTMLElement | string | null>;
-	#triggerId: ReadonlyBox<string>;
-	#contentId: ReadonlyBox<string>;
+	#openBox: WritableBox<boolean>;
+	#positioningBox: ReadableBox<FloatingConfig | null>;
+	#arrowSizeBox: ReadableBox<number>;
+	#openDelayBox: ReadableBox<number>;
+	#closeDelayBox: ReadableBox<number>;
+	#closeOnPointerDownBox: ReadableBox<boolean>;
+	#closeOnEscapeBox: ReadableBox<boolean>;
+	#forceVisibleBox: ReadableBox<boolean>;
+	#disableHoverableContentBox: ReadableBox<boolean>;
+	#groupBox: ReadableBox<string | boolean | undefined>;
+	#portalBox: ReadableBox<PortalTarget | null>;
+	#triggerIdBox: ReadableBox<string>;
+	#contentIdBox: ReadableBox<string>;
 
 	constructor(props: TooltipProps = {}) {
 		const {
@@ -50,27 +56,27 @@ export class Tooltip {
 			forceVisible = false,
 			disableHoverableContent = false,
 			group,
-			portal = "body",
+			portal,
 			triggerId = generateId(),
 			contentId = generateId(),
 		} = props;
 
-		this.#open = box(open);
-		this.#positioning = readonlyBox(positioning);
-		this.#arrowSize = readonlyBox(arrowSize);
-		this.#openDelay = readonlyBox(openDelay);
-		this.#closeDelay = readonlyBox(closeDelay);
-		this.#closeOnPointerDown = readonlyBox(closeOnPointerDown);
-		this.#closeOnEscape = readonlyBox(closeOnEscape);
-		this.#forceVisible = readonlyBox(forceVisible);
-		this.#disableHoverableContent = readonlyBox(disableHoverableContent);
-		this.#group = readonlyBox(group);
-		this.#portal = readonlyBox(portal);
-		this.#triggerId = readonlyBox(triggerId);
-		this.#contentId = readonlyBox(contentId);
+		this.#openBox = writableBox(open);
+		this.#positioningBox = readableBox(positioning);
+		this.#arrowSizeBox = readableBox(arrowSize);
+		this.#openDelayBox = readableBox(openDelay);
+		this.#closeDelayBox = readableBox(closeDelay);
+		this.#closeOnPointerDownBox = readableBox(closeOnPointerDown);
+		this.#closeOnEscapeBox = readableBox(closeOnEscape);
+		this.#forceVisibleBox = readableBox(forceVisible);
+		this.#disableHoverableContentBox = readableBox(disableHoverableContent);
+		this.#groupBox = readableBox(group);
+		this.#portalBox = readableBox(portal);
+		this.#triggerIdBox = readableBox(triggerId);
+		this.#contentIdBox = readableBox(contentId);
 	}
 
-	#openReason: OpenReason | null = $state(null);
+	#openReason: OpenReason | null = null;
 	#isMouseInTooltipArea = false;
 	#clickedTrigger = false;
 	#openTimeout: number | null = null;
@@ -78,61 +84,61 @@ export class Tooltip {
 
 	// States
 	get open() {
-		return this.#open.value;
+		return this.#openBox.value;
 	}
 
 	set open(value) {
-		this.#open.value = value;
+		this.#openBox.value = value;
 		this.#clearOpenTimeout();
 		this.#clearCloseTimeout();
 	}
 
 	get positioning() {
-		return this.#positioning.value;
+		return this.#positioningBox.value;
 	}
 
 	get arrowSize() {
-		return this.#arrowSize.value;
+		return this.#arrowSizeBox.value;
 	}
 
 	get openDelay() {
-		return this.#openDelay.value;
+		return this.#openDelayBox.value;
 	}
 
 	get closeDelay() {
-		return this.#closeDelay.value;
+		return this.#closeDelayBox.value;
 	}
 
 	get closeOnPointerDown() {
-		return this.#closeOnPointerDown.value;
+		return this.#closeOnPointerDownBox.value;
 	}
 
 	get closeOnEscape() {
-		return this.#closeOnEscape.value;
+		return this.#closeOnEscapeBox.value;
 	}
 
 	get forceVisible() {
-		return this.#forceVisible.value;
+		return this.#forceVisibleBox.value;
 	}
 
 	get disableHoverableContent() {
-		return this.#disableHoverableContent.value;
+		return this.#disableHoverableContentBox.value;
 	}
 
 	get group() {
-		return this.#group.value;
+		return this.#groupBox.value;
 	}
 
 	get portal() {
-		return this.#portal.value;
+		return this.#portalBox.value;
 	}
 
 	get triggerId() {
-		return this.#triggerId.value;
+		return this.#triggerIdBox.value;
 	}
 
 	get contentId() {
-		return this.#contentId.value;
+		return this.#contentIdBox.value;
 	}
 
 	get #hidden() {
@@ -141,14 +147,14 @@ export class Tooltip {
 
 	// Helpers
 	#clearOpenTimeout() {
-		if (this.#openTimeout) {
+		if (this.#openTimeout !== null) {
 			window.clearTimeout(this.#openTimeout);
 			this.#openTimeout = null;
 		}
 	}
 
 	#clearCloseTimeout() {
-		if (this.#closeTimeout) {
+		if (this.#closeTimeout !== null) {
 			window.clearTimeout(this.#closeTimeout);
 			this.#closeTimeout = null;
 		}
@@ -157,7 +163,7 @@ export class Tooltip {
 	#openTooltip(reason: OpenReason) {
 		this.#clearCloseTimeout();
 
-		if (!this.#openTimeout) {
+		if (this.#openTimeout === null) {
 			this.#openTimeout = window.setTimeout(() => {
 				this.open = true;
 				// Don't override the reason if it's already set.
@@ -178,7 +184,7 @@ export class Tooltip {
 			return;
 		}
 
-		if (!this.#closeTimeout) {
+		if (this.#closeTimeout === null) {
 			this.#closeTimeout = window.setTimeout(() => {
 				this.open = false;
 				this.#openReason = null;
@@ -188,9 +194,7 @@ export class Tooltip {
 	}
 
 	// Elements
-	readonly trigger = this.#createTrigger();
-
-	#createTrigger() {
+	trigger() {
 		const self = this;
 		return element("tooltip-trigger", {
 			get "aria-describedby"() {
@@ -229,15 +233,13 @@ export class Tooltip {
 		}
 	}
 
-	readonly content = this.#createContent();
-
-	#createContent() {
+	content() {
 		const self = this;
 		return element("tooltip-content", {
 			role: "tooltip",
 			tabindex: -1,
 			get hidden() {
-				return self.#hidden ? true : undefined;
+				return booleanAttr(self.#hidden);
 			},
 			get style() {
 				return self.#hidden ? "display: none;" : undefined;
@@ -246,7 +248,7 @@ export class Tooltip {
 				return self.contentId;
 			},
 			get "data-portal"() {
-				return self.portal ? "" : undefined;
+				return self.portal !== null ? "" : undefined;
 			},
 			onpointerenter() {
 				self.#openTooltip("pointer");
@@ -257,9 +259,7 @@ export class Tooltip {
 		});
 	}
 
-	readonly arrow = this.#createArrow();
-
-	#createArrow() {
+	arrow() {
 		const self = this;
 		return element("tooltip-arrow", {
 			"data-arrow": true,
@@ -275,7 +275,7 @@ export class Tooltip {
 	}
 
 	// Effects
-	readonly dispose = autodisposable(() => {
+	readonly destroy = autoDestroyEffectRoot(() => {
 		$effect(() => {
 			const group = this.group;
 			if (group === undefined || group === false) return;
@@ -306,7 +306,7 @@ export class Tooltip {
 			return addEventListener(document, "mousemove", (e) => {
 				const triggerEl = document.getElementById(this.triggerId);
 				const contentEl = document.getElementById(this.contentId);
-				if (!triggerEl || !contentEl) return;
+				if (triggerEl === null || contentEl === null) return;
 
 				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
 				const polygon = makeHullFromElements(polygonElements);
@@ -335,30 +335,28 @@ export class Tooltip {
 		let unsubPortal = noop;
 
 		$effect(() => {
-			if (this.#hidden) return;
-
 			const triggerEl = document.getElementById(this.triggerId);
 			const contentEl = document.getElementById(this.contentId);
-			if (!triggerEl || !contentEl) {
+			if (this.#hidden || triggerEl === null || contentEl === null) {
 				unsubFloating();
 				unsubPortal();
+				unsubFloating = unsubPortal = noop;
 				return;
 			}
 
 			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
+			unsubFloating();
 			unsubFloating = floatingReturn.destroy;
-			if (!this.portal) {
-				unsubFloating();
+
+			if (this.portal === null) {
+				unsubPortal();
+				unsubPortal = noop;
 				return;
 			}
 
 			const portalDest = getPortalDestination(contentEl, this.portal);
-			if (portalDest) {
-				const portalReturn = usePortal(contentEl, portalDest);
-				if (portalReturn && portalReturn.destroy) {
-					unsubPortal = portalReturn.destroy;
-				}
-			}
+			const portalReturn = usePortal(contentEl, portalDest);
+			unsubPortal = portalReturn.destroy;
 		});
 
 		return () => {

@@ -1,10 +1,7 @@
 <script lang="ts">
-	import { Toggle } from "$lib";
-	import ToggleComponent from "./Toggle.svelte";
+	import { Toggle } from "$lib/index.js";
 
-	const uncontrolled = new Toggle({
-		pressed: true,
-	});
+	const uncontrolled = new Toggle();
 
 	let pressed = $state(false);
 	let disabled = $state(false);
@@ -17,14 +14,16 @@
 		disabled: () => disabled,
 	});
 
-	$inspect("pressed", pressed, "disabled", disabled);
+	$inspect("pressed", pressed);
+	$inspect("disabled", disabled);
 </script>
 
-<section>
-	<h1>Uncontrolled</h1>
+<h1>Toggle</h1>
 
-	<div class="mt-3">
-		<button {...uncontrolled.root} class="btn">
+<section>
+	<h2>Uncontrolled</h2>
+	<div>
+		<button {...uncontrolled.root()} class="btn">
 			{#if uncontrolled.pressed}
 				On
 			{:else}
@@ -37,10 +36,9 @@
 <hr class="my-8" />
 
 <section>
-	<h1>Controlled</h1>
-
-	<div class="mt-3 flex items-center">
-		<button {...controlled.root} class="btn">
+	<h2>Controlled</h2>
+	<div class="flex items-center">
+		<button {...controlled.root()} class="btn">
 			{#if pressed}
 				On
 			{:else}
@@ -48,17 +46,7 @@
 			{/if}
 		</button>
 
-		<ToggleComponent bind:pressed {disabled} class="ml-4">
-			{#snippet off()}
-				Off
-			{/snippet}
-
-			{#snippet on()}
-				On
-			{/snippet}
-		</ToggleComponent>
-
-		<label for="disabled" class="ml-24 select-none">Disabled</label>
+		<label for="disabled" class="ml-auto select-none">Disabled</label>
 		<input id="disabled" type="checkbox" bind:checked={disabled} class="ml-2" />
 	</div>
 </section>

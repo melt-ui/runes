@@ -2,7 +2,9 @@
 	export let data;
 </script>
 
-<div class="flex w-fit flex-col gap-4 p-8">
+<h1>Melt UI Showcase</h1>
+
+<div class="flex gap-4">
 	{#each data.routes as route}
 		<a href="/playground/{route}" class="btn capitalize">
 			{route}

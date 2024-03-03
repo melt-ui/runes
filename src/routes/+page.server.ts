@@ -1,5 +1,5 @@
 import fs from "node:fs/promises";
-import type { PageServerLoad } from "./$types";
+import type { PageServerLoad } from "./$types.js";
 
 export const load: PageServerLoad = async () => {
 	const dirs = await fs.readdir("src/routes/playground", { withFileTypes: true });

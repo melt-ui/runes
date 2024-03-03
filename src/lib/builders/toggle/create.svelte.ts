@@ -1,40 +1,45 @@
-import { disabledAttr, element, kbd } from "$lib/internal/helpers";
-import { box, readonlyBox, type Box, type ReadonlyBox } from "$lib/internal/helpers/box.svelte";
-import type { ToggleProps } from "./types";
+import {
+	booleanAttr,
+	element,
+	kbd,
+	readableBox,
+	writableBox,
+	type ReadableBox,
+	type WritableBox,
+} from "$lib/internal/helpers/index.js";
+import type { ToggleProps } from "./types.js";
 
 export class Toggle {
-	#pressed: Box<boolean>;
-	#disabled: ReadonlyBox<boolean>;
+	#pressedBox: WritableBox<boolean>;
+	#disabledBox: ReadableBox<boolean>;
 
 	constructor(props: ToggleProps = {}) {
 		const { pressed = false, disabled = false } = props;
-		this.#pressed = box(pressed);
-		this.#disabled = readonlyBox(disabled);
+		this.#pressedBox = writableBox(pressed);
+		this.#disabledBox = readableBox(disabled);
 	}
 
 	get pressed() {
-		return this.#pressed.value;
+		return this.#pressedBox.value;
 	}
 
 	set pressed(v: boolean) {
-		this.#pressed.value = v;
+		this.#pressedBox.value = v;
 	}
 
 	get disabled() {
-		return this.#disabled.value;
+		return this.#disabledBox.value;
 	}
 
-	readonly root = this.#createRoot();
-
-	#createRoot() {
+	root() {
 		const self = this;
 		return element("toggle", {
 			type: "button",
 			get disabled() {
-				return disabledAttr(self.disabled);
+				return booleanAttr(self.disabled);
 			},
 			get "data-disabled"() {
-				return disabledAttr(self.disabled);
+				return booleanAttr(self.disabled);
 			},
 			get "data-state"() {
 				return self.pressed ? "on" : "off";
@@ -63,8 +68,8 @@ export class Toggle {
 // due to the need of creating getters and setters for every modifiable property.
 // - I still think the fn approach is more readable. It's so clean! But classes aren't bad either.
 export function createToggle(props: ToggleProps = {}) {
-	const _pressed = box(props.pressed ?? false);
-	const _disabled = readonlyBox(props.disabled ?? false);
+	const _pressed = writableBox(props.pressed ?? false);
+	const _disabled = readableBox(props.disabled ?? false);
 
 	const states = {
 		get pressed() {
@@ -80,10 +85,10 @@ export function createToggle(props: ToggleProps = {}) {
 
 	const root = element("toggle", {
 		get disabled() {
-			return disabledAttr(states.disabled);
+			return booleanAttr(states.disabled);
 		},
 		get "data-disabled"() {
-			return disabledAttr(states.disabled);
+			return booleanAttr(states.disabled);
 		},
 		get "data-state"() {
 			return states.pressed ? "on" : "off";
