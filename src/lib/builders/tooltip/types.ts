@@ -88,12 +88,12 @@ export type TooltipProps = {
 	portal?: ReadableProp<PortalTarget | null>;
 
 	/**
-	 * Optionally override the default ids we assign to the trigger element.
+	 * Optionally override the default id we assign to the trigger element.
 	 */
 	triggerId?: ReadableProp<string>;
 
 	/**
-	 * Optionally override the default ids we assign to the content element.
+	 * Optionally override the default id we assign to the content element.
 	 */
 	contentId?: ReadableProp<string>;
 };

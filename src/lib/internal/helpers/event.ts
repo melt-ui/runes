@@ -1,25 +1,32 @@
-import type { EventHandler } from "$lib/internal/types.js";
-
 // Overloaded function signatures for addEventListener
-
-export function addEventListener<E extends keyof WindowEventMap>(
+export function addEventListener<TEvent extends keyof WindowEventMap>(
 	target: Window,
-	event: E,
-	handler: (this: Window, event: WindowEventMap[E]) => unknown,
+	event: TEvent,
+	handler: (this: Window, event: WindowEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions,
 ): VoidFunction;
 
-export function addEventListener<E extends keyof DocumentEventMap>(
+export function addEventListener<TEvent extends keyof DocumentEventMap>(
 	target: Document,
-	event: E,
-	handler: (this: Document, event: DocumentEventMap[E]) => unknown,
+	event: TEvent,
+	handler: (this: Document, event: DocumentEventMap[TEvent]) => unknown,
 	options?: boolean | AddEventListenerOptions,
 ): VoidFunction;
 
-export function addEventListener<E extends keyof HTMLElementEventMap>(
+export function addEventListener<
+	TElement extends HTMLElement,
+	TEvent extends keyof HTMLElementEventMap,
+>(
+	target: TElement,
+	event: TEvent,
+	handler: (this: TElement, event: HTMLElementEventMap[TEvent]) => unknown,
+	options?: boolean | AddEventListenerOptions,
+): VoidFunction;
+
+export function addEventListener(
 	target: EventTarget,
-	event: E,
-	handler: EventHandler<HTMLElementEventMap[E]>,
+	event: string,
+	handler: EventListenerOrEventListenerObject,
 	options?: boolean | AddEventListenerOptions,
 ): VoidFunction;
 
