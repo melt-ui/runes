@@ -3,7 +3,7 @@ import { isHTMLElement } from "./is.js";
 
 /**
  * Get an element's ancestor which has a `data-portal` attribute.
- * 
+ *
  * This is used to handle nested portals/overlays/dialogs/popovers.
  */
 function getPortalParent(node: HTMLElement) {
