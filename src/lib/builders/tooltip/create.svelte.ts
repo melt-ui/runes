@@ -1,11 +1,11 @@
 import {
+	useEventListener,
 	useFloating,
 	usePortal,
 	type FloatingConfig,
 	type PortalTarget,
 } from "$lib/internal/actions/index.js";
 import {
-	addEventListener,
 	autoDestroyEffectRoot,
 	booleanAttr,
 	element,
@@ -313,7 +313,7 @@ export class Tooltip {
 				return;
 			}
 
-			return addEventListener(document, "mousemove", (event) => {
+			useEventListener(document, "mousemove", (event) => {
 				const triggerEl = document.getElementById(this.triggerId);
 				const contentEl = document.getElementById(this.contentId);
 				if (triggerEl === null || contentEl === null) {
@@ -337,9 +337,7 @@ export class Tooltip {
 			});
 		});
 
-		$effect(() => {
-			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
-		});
+		useEventListener(document, "keydown", this.#handleKeyDown.bind(this));
 
 		let cleanupFloating = noop;
 		let cleanupPortal = noop;
