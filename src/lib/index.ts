@@ -1,3 +1,4 @@
+export * from "./builders/dialog/index.js";
 export * from "./builders/label/index.js";
 export * from "./builders/toggle/index.js";
 export * from "./builders/tooltip/index.js";
