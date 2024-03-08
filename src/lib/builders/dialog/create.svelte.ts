@@ -23,7 +23,7 @@ import { createFocusTrap, type FocusTrap } from "focus-trap";
 import { tick } from "svelte";
 import type { DialogProps, DialogRole } from "./types.js";
 
-const names = {
+const elements = {
 	TRIGGER: "dialog-trigger",
 	OVERLAY: "dialog-overlay",
 	CONTENT: "dialog-content",
@@ -169,7 +169,7 @@ export class Dialog {
 	// Elements
 	trigger() {
 		const dialog = this;
-		return element(names.TRIGGER, {
+		return element(elements.TRIGGER, {
 			"aria-haspopup": "dialog",
 			type: "button",
 			get "aria-expanded"() {
@@ -187,7 +187,7 @@ export class Dialog {
 
 	overlay() {
 		const dialog = this;
-		return element(names.OVERLAY, {
+		return element(elements.OVERLAY, {
 			"aria-hidden": true,
 			tabindex: -1,
 			get id() {
@@ -206,7 +206,7 @@ export class Dialog {
 
 	content() {
 		const dialog = this;
-		return element(names.CONTENT, {
+		return element(elements.CONTENT, {
 			"aria-modal": "true",
 			tabindex: -1,
 			get id() {
@@ -237,7 +237,7 @@ export class Dialog {
 
 	portalled() {
 		const dialog = this;
-		return element(names.PORTALLED, {
+		return element(elements.PORTALLED, {
 			get id() {
 				return dialog.portalledId;
 			},
@@ -249,7 +249,7 @@ export class Dialog {
 
 	title() {
 		const dialog = this;
-		return element(names.TITLE, {
+		return element(elements.TITLE, {
 			get id() {
 				return dialog.titleId;
 			},
@@ -258,7 +258,7 @@ export class Dialog {
 
 	description() {
 		const dialog = this;
-		return element(names.DESCRIPTION, {
+		return element(elements.DESCRIPTION, {
 			get id() {
 				return dialog.descriptionId;
 			},
@@ -267,7 +267,7 @@ export class Dialog {
 
 	closeButton() {
 		const dialog = this;
-		return element(names.CLOSE, {
+		return element(elements.CLOSE, {
 			type: "button",
 			onclick: dialog.#close.bind(dialog),
 			onkeydown(event) {
