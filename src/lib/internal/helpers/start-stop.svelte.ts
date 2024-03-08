@@ -17,13 +17,15 @@ export class StartStop<TValue> {
 	get value(): TValue {
 		if ($effect.active()) {
 			$effect(() => {
-				if (this.#subscribers++ === 0) {
+				this.#subscribers++;
+				if (this.#subscribers === 1) {
 					this.#subscribe();
 				}
 
 				return () => {
 					tick().then(() => {
-						if (--this.#subscribers === 0) {
+						this.#subscribers--;
+						if (this.#subscribers === 0) {
 							this.#unsubscribe();
 						}
 					});
@@ -41,9 +43,10 @@ export class StartStop<TValue> {
 	}
 
 	#unsubscribe() {
-		if (this.#stop !== null) {
-			this.#stop();
-			this.#stop = null;
+		if (this.#stop === null) {
+			return;
 		}
+		this.#stop();
+		this.#stop = null;
 	}
 }

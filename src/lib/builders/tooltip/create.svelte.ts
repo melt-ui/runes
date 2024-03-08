@@ -148,17 +148,19 @@ export class Tooltip {
 
 	// Helpers
 	#clearOpenTimeout() {
-		if (this.#openTimeout !== null) {
-			window.clearTimeout(this.#openTimeout);
-			this.#openTimeout = null;
+		if (this.#openTimeout === null) {
+			return;
 		}
+		window.clearTimeout(this.#openTimeout);
+		this.#openTimeout = null;
 	}
 
 	#clearCloseTimeout() {
-		if (this.#closeTimeout !== null) {
-			window.clearTimeout(this.#closeTimeout);
-			this.#closeTimeout = null;
+		if (this.#closeTimeout === null) {
+			return;
 		}
+		window.clearTimeout(this.#closeTimeout);
+		this.#closeTimeout = null;
 	}
 
 	#open(reason: OpenReason) {
@@ -217,19 +219,22 @@ export class Tooltip {
 				}
 			},
 			onpointerenter(event) {
-				if (!isTouch(event)) {
-					tooltip.#open("pointer");
+				if (isTouch(event)) {
+					return;
 				}
+				tooltip.#open("pointer");
 			},
 			onpointerleave(event) {
-				if (!isTouch(event)) {
-					tooltip.#clearOpenTimeout();
+				if (isTouch(event)) {
+					return;
 				}
+				tooltip.#clearOpenTimeout();
 			},
 			onfocus() {
-				if (!tooltip.#clickedTrigger) {
-					tooltip.#open("focus");
+				if (tooltip.#clickedTrigger) {
+					return;
 				}
+				tooltip.#open("focus");
 			},
 			onblur() {
 				tooltip.#close(true);

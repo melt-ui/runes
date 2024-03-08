@@ -10,10 +10,11 @@ export function autoDestroyEffectRoot(fn: () => void | VoidFunction) {
 	let cleanup: VoidFunction | null = $effect.root(fn);
 
 	function destroy() {
-		if (cleanup !== null) {
-			cleanup();
-			cleanup = null;
+		if (cleanup === null) {
+			return;
 		}
+		cleanup();
+		cleanup = null;
 	}
 
 	try {

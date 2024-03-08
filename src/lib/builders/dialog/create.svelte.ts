@@ -179,10 +179,11 @@ export class Dialog {
 			},
 			onclick: dialog.#open.bind(dialog),
 			onkeydown(event) {
-				if (event.key === kbd.ENTER || event.key === kbd.SPACE) {
-					event.preventDefault();
-					dialog.#open(event);
+				if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
+					return;
 				}
+				event.preventDefault();
+				dialog.#open(event);
 			},
 		});
 	}
@@ -273,7 +274,7 @@ export class Dialog {
 			type: "button",
 			onclick: dialog.#close.bind(dialog),
 			onkeydown(event) {
-				if (event.key !== kbd.SPACE && event.key !== kbd.ENTER) {
+				if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
 					return;
 				}
 				event.preventDefault();

@@ -48,15 +48,17 @@ export class Toggle {
 				return toggle.pressed ? "on" : "off";
 			},
 			onclick() {
-				if (!toggle.disabled) {
-					toggle.pressed = !toggle.pressed;
+				if (toggle.disabled) {
+					return;
 				}
+				toggle.pressed = !toggle.pressed;
 			},
 			onkeydown(event) {
-				if (event.key === kbd.ENTER || event.key === kbd.SPACE) {
-					event.preventDefault();
-					this.onclick();
+				if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
+					return;
 				}
+				event.preventDefault();
+				this.onclick();
 			},
 		});
 	}
