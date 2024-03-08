@@ -2,10 +2,10 @@ import { isFunction, isHTMLElement } from "$lib/internal/helpers/index.js";
 import { tick } from "svelte";
 
 export type FocusTarget = string | HTMLElement | null;
-export type FocusProp = FocusTarget | ((defaultEl?: HTMLElement | null) => FocusTarget);
+export type FocusProp = FocusTarget | ((defaultEl: HTMLElement | null) => FocusTarget) | undefined;
 
 export type HandleFocusArgs = {
-	prop?: FocusProp;
+	prop: FocusProp;
 	defaultEl: HTMLElement | null;
 };
 

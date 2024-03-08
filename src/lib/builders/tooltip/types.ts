@@ -73,7 +73,7 @@ export type TooltipProps = {
 	disableHoverableContent?: ReadableProp<boolean>;
 
 	/**
-	 * If set to `true` or a string, whenever you open this tooltip
+	 * If set to `true` or a string, whenever you open this tooltip,
 	 * all other tooltips with the same `group` value will close.
 	 */
 	group?: ReadableProp<boolean | string | undefined>;
@@ -82,8 +82,6 @@ export type TooltipProps = {
 	 * If not `undefined`, the tooltip will be rendered within the provided element or selector.
 	 *
 	 * If `null`, the element won't portal.
-	 *
-	 * @default 'body'
 	 */
 	portal?: ReadableProp<PortalTarget | null>;
 

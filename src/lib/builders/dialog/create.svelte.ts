@@ -44,8 +44,8 @@ export class Dialog {
 	#roleBox: ReadableBox<DialogRole>;
 	#portalBox: ReadableBox<PortalTarget>;
 	#forceVisibleBox: WritableBox<boolean>;
-	#openFocusBox: ReadableBox<FocusProp | undefined>;
-	#closeFocusBox: ReadableBox<FocusProp | undefined>;
+	#openFocusBox: ReadableBox<FocusProp>;
+	#closeFocusBox: ReadableBox<FocusProp>;
 	#overlayIdBox: ReadableBox<string>;
 	#contentIdBox: ReadableBox<string>;
 	#portalledIdBox: ReadableBox<string>;
