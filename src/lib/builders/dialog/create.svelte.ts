@@ -7,7 +7,6 @@ import {
 import type { PortalTarget } from "$lib/internal/actions/portal.js";
 import {
 	autoDestroyEffectRoot,
-	booleanAttr,
 	element,
 	generateId,
 	getPortalDestination,
@@ -225,7 +224,7 @@ export class Dialog {
 				return dialog.titleId;
 			},
 			get "aria-hidden"() {
-				return booleanAttr(!dialog.open);
+				return !dialog.open;
 			},
 			get style() {
 				return styleToString({
