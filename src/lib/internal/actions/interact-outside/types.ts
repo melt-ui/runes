@@ -1,21 +1,15 @@
-export type InteractOutsideEvent = PointerEvent | MouseEvent | TouchEvent;
-
 export type InteractOutsideConfig = {
 	/**
-	 * Callback fired when an outside interaction event completes,
-	 * which is either a `pointerup`, `mouseup`, or `touchend`
-	 * event, depending on the user's input device.
+	 * Callback fired when an outside `pointerup` event completes.
 	 */
-	onInteractOutside?: (event: InteractOutsideEvent) => void;
+	onInteractOutside?: (event: PointerEvent) => void;
 
 	/**
-	 * Callback fired when an outside interaction event starts,
-	 * which is either a `pointerdown`, `mousedown`, or `touchstart`
-	 * event, depending on the user's input device.
+	 * Callback fired when an outside `pointerdown` event starts.
 	 *
 	 * This callback is useful when you want to know when the user
 	 * begins an outside interaction, but before the interaction
 	 * completes.
 	 */
-	onInteractOutsideStart?: (event: InteractOutsideEvent) => void;
+	onInteractOutsideStart?: (event: PointerEvent) => void;
 };

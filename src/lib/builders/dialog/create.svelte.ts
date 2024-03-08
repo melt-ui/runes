@@ -40,7 +40,7 @@ export class Dialog {
 	#preventScrollBox: ReadableBox<boolean>;
 	#closeOnEscapeBox: ReadableBox<boolean>;
 	#closeOnOutsideClickBox: ReadableBox<boolean>;
-	#onOutsideClick?: (event: PointerEvent | MouseEvent | TouchEvent) => void;
+	#onOutsideClick?: (event: PointerEvent) => void;
 	#roleBox: ReadableBox<DialogRole>;
 	#portalBox: ReadableBox<PortalTarget>;
 	#forceVisibleBox: WritableBox<boolean>;

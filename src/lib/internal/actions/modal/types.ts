@@ -1,5 +1,3 @@
-import type { InteractOutsideEvent } from "$lib/internal/actions/index.js";
-
 export type ModalConfig = {
 	/**
 	 * Whether the modal is currently open.
@@ -30,5 +28,5 @@ export type ModalConfig = {
 	 * closing the modal. If `closeOnInteractOutside` is `false`, this function
 	 * will not be called.
 	 */
-	shouldCloseOnInteractOutside?: (event: InteractOutsideEvent) => boolean;
+	shouldCloseOnInteractOutside?: (event: PointerEvent) => boolean;
 };
