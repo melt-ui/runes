@@ -43,7 +43,6 @@ export class Dialog {
 	#onOutsideClick?: (event: PointerEvent) => void;
 	#roleBox: ReadableBox<DialogRole>;
 	#portalBox: ReadableBox<PortalTarget>;
-	#forceVisibleBox: WritableBox<boolean>;
 	#openFocusBox: ReadableBox<FocusProp>;
 	#closeFocusBox: ReadableBox<FocusProp>;
 	#overlayIdBox: ReadableBox<string>;
@@ -61,7 +60,6 @@ export class Dialog {
 			onOutsideClick,
 			role = "dialog",
 			portal,
-			forceVisible = false,
 			openFocus,
 			closeFocus,
 			overlayId = generateId(),
@@ -78,7 +76,6 @@ export class Dialog {
 		this.#onOutsideClick = onOutsideClick;
 		this.#roleBox = readableBox(role);
 		this.#portalBox = readableBox(portal);
-		this.#forceVisibleBox = readableBox(forceVisible);
 		this.#openFocusBox = readableBox(openFocus);
 		this.#closeFocusBox = readableBox(closeFocus);
 		this.#overlayIdBox = readableBox(overlayId);
@@ -118,10 +115,6 @@ export class Dialog {
 		return this.#portalBox.value;
 	}
 
-	get forceVisible() {
-		return this.#forceVisibleBox.value;
-	}
-
 	get openFocus() {
 		return this.#openFocusBox.value;
 	}
@@ -148,10 +141,6 @@ export class Dialog {
 
 	get descriptionId() {
 		return this.#descriptionIdBox.value;
-	}
-
-	get #invisible() {
-		return !this.open && !this.forceVisible;
 	}
 
 	// Helpers
@@ -198,7 +187,7 @@ export class Dialog {
 			},
 			get style() {
 				return styleToString({
-					display: dialog.#invisible ? "none" : undefined,
+					display: !dialog.open ? "none" : undefined,
 				});
 			},
 			get "data-state"() {
@@ -229,7 +218,7 @@ export class Dialog {
 			},
 			get style() {
 				return styleToString({
-					display: dialog.#invisible ? "none" : undefined,
+					display: !dialog.open ? "none" : undefined,
 				});
 			},
 			get "data-state"() {

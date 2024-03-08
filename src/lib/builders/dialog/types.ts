@@ -55,16 +55,6 @@ export type DialogProps = {
 	portal?: ReadableProp<PortalTarget>;
 
 	/**
-	 * If `true`, the dialog will be visible regardless of the open state.
-	 *
-	 * Use this when you want to conditionally render the content of the dialog
-	 * using an `{#if ...}` block.
-	 *
-	 * @default false
-	 */
-	forceVisible?: ReadableProp<boolean>;
-
-	/**
 	 * Override the default autofocus behavior of the dialog
 	 * on open.
 	 */
