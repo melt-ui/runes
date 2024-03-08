@@ -313,7 +313,7 @@ export class Dialog {
 		});
 
 		$effect(() => {
-			// Access `open` early to re-run the effect even if we return early.
+			// Access `open` early to re-run the effect when it changes, even if we return early.
 			const open = this.open;
 
 			const contentEl = document.getElementById(this.contentId);
