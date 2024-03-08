@@ -384,8 +384,15 @@ export class Dialog {
 				prop: this.openFocus,
 				defaultEl: contentEl,
 			});
+		});
 
-			if (!this.preventScroll) {
+		$effect(() => {
+			if (!this.preventScroll || !this.open) {
+				return;
+			}
+
+			const contentEl = document.getElementById(this.contentId);
+			if (contentEl === null) {
 				return;
 			}
 

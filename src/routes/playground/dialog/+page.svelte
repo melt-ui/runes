@@ -17,7 +17,7 @@
 
 		<div
 			{...dialog.content()}
-			class="fixed left-1/2 top-1/2 z-50 h-fit w-fit -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-neutral-50 p-4 text-neutral-900"
+			class="fixed left-1/2 top-1/2 z-50 h-fit w-fit -translate-x-1/2 -translate-y-1/2 rounded-lg border bg-neutral-50 p-4 text-neutral-900 focus:outline focus:outline-2 focus:outline-offset-2 focus:outline-orange-400"
 			transition:fade={{ duration: 200 }}
 		>
 			<h1 {...dialog.title()} class="mb-4 text-2xl font-medium">Title</h1>
