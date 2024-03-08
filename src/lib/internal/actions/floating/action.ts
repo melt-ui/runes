@@ -32,6 +32,7 @@ const ARROW_TRANSFORM = {
 	right: "rotate(315deg)",
 };
 
+// TODO: use `$effect` to automatically cleanup
 export function useFloating(
 	reference: HTMLElement | VirtualElement,
 	floating: HTMLElement,

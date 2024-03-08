@@ -4,6 +4,7 @@ import { isHTMLElement } from "../helpers/index.js";
 
 export type PortalTarget = string | HTMLElement | undefined;
 
+// TODO: use `$effect` to automatically cleanup
 export function usePortal(el: HTMLElement, target?: PortalTarget) {
 	async function run() {
 		const targetEl = await getTargetEl(target);
