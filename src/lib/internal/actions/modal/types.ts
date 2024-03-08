@@ -1,10 +1,5 @@
 export type ModalConfig = {
 	/**
-	 * Whether the modal is currently open.
-	 */
-	open: boolean;
-
-	/**
 	 * Handler called when the overlay closes.
 	 */
 	onClose?: () => void;

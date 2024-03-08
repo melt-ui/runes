@@ -16,19 +16,14 @@ function isLastModal(node: HTMLElement) {
 }
 
 export function useModal(node: HTMLElement, config: ModalConfig) {
-	const { open, onClose, closeOnInteractOutside = false, shouldCloseOnInteractOutside } = config;
+	const { onClose, closeOnInteractOutside = true, shouldCloseOnInteractOutside } = config;
 
-	setTimeout(() => {
-		if (open) {
-			visibleModals.push(node);
-		} else {
+	$effect(() => {
+		visibleModals.push(node);
+		return () => {
 			removeFromVisibleModals(node);
-		}
-	}, 100);
-
-	if (!open) {
-		return;
-	}
+		};
+	});
 
 	useInteractOutside(node, {
 		onInteractOutsideStart(event) {

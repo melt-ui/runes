@@ -316,8 +316,9 @@ export class Dialog {
 		});
 
 		$effect(() => {
-			// Access `open` early to re-run the effect when it changes, even if we return early.
-			const open = this.open;
+			if (!this.open) {
+				return;
+			}
 
 			const contentEl = document.getElementById(this.contentId);
 			if (contentEl === null) {
@@ -325,7 +326,6 @@ export class Dialog {
 			}
 
 			useModal(contentEl, {
-				open,
 				closeOnInteractOutside: this.closeOnOutsideClick,
 				onClose: this.#close.bind(this),
 				shouldCloseOnInteractOutside: (event) => {
