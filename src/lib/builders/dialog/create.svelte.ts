@@ -1,4 +1,9 @@
-import { useEscapeKeydown, useModal, usePortal } from "$lib/internal/actions/index.js";
+import {
+	useEscapeKeydown,
+	useFocusTrap,
+	useModal,
+	usePortal,
+} from "$lib/internal/actions/index.js";
 import type { PortalTarget } from "$lib/internal/actions/portal.js";
 import {
 	autoDestroyEffectRoot,
@@ -19,8 +24,6 @@ import {
 	type ReadableBox,
 	type WritableBox,
 } from "$lib/internal/helpers/index.js";
-import { createFocusTrap, type FocusTrap } from "focus-trap";
-import { tick } from "svelte";
 import type { DialogProps, DialogRole } from "./types.js";
 
 const elements = {
@@ -333,40 +336,20 @@ export class Dialog {
 		});
 
 		$effect(() => {
-			let focusTrap: FocusTrap | null = null;
+			if (!this.open) {
+				return;
+			}
 
-			$effect(() => {
-				if (!this.open) {
-					return;
-				}
+			const contentEl = document.getElementById(this.contentId);
+			if (contentEl === null) {
+				return;
+			}
 
-				const contentEl = document.getElementById(this.contentId);
-				if (contentEl === null) {
-					return;
-				}
-
-				focusTrap = createFocusTrap(contentEl, {
-					escapeDeactivates: true,
-					clickOutsideDeactivates: true,
-					returnFocusOnDeactivate: false,
-					fallbackFocus: contentEl,
-				});
-
-				return () => {
-					focusTrap?.deactivate();
-					focusTrap = null;
-				};
-			});
-
-			$effect(() => {
-				const invisible = this.#invisible;
-				tick().then(() => {
-					if (invisible) {
-						focusTrap?.deactivate();
-					} else {
-						focusTrap?.activate();
-					}
-				});
+			useFocusTrap(contentEl, {
+				escapeDeactivates: true,
+				clickOutsideDeactivates: true,
+				returnFocusOnDeactivate: false,
+				fallbackFocus: contentEl,
 			});
 		});
 
@@ -396,12 +379,12 @@ export class Dialog {
 				return;
 			}
 
-			const cleanupScroll = removeScroll();
-			return () => {
-				if (!this.open) {
+			$effect(() => {
+				const cleanupScroll = removeScroll();
+				return () => {
 					runAfterTransitionOutOrImmediate(contentEl, cleanupScroll);
-				}
-			};
+				};
+			});
 		});
 
 		$effect(() => {
