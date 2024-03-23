@@ -18,13 +18,22 @@ The new API relies on classes instead of stores for creating builders.
 	export let open;
 
 	const {
-		elements: { trigger, content, arrow }
-	} = createTooltip({ open });
+		elements: { trigger, content, arrow },
+		states,
+	} = createTooltip({
+		defaultOpen: open,
+		onOpenChange: ({ curr, next }) => {
+			open = next;
+			return next;
+		},
+	});
+
+	$: states.open.set(open);
 </script>
 
 <button use:melt={$trigger}>Trigger</button>
 
-{#if $open}
+{#if open}
 	<div use:melt={$content}>
 		<div use:melt={$arrow} />
 		<p>Hello world!</p>
