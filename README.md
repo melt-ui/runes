@@ -21,7 +21,7 @@ The new API relies on classes instead of stores for creating builders.
 		elements: { trigger, content, arrow },
 		states,
 	} = createTooltip({
-		open,
+		defaultOpen: open,
 		onOpenChange: ({ curr, next }) => {
 			open = next;
 			return next;
