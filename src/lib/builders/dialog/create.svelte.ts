@@ -368,12 +368,10 @@ export class Dialog {
 				return;
 			}
 
-			$effect(() => {
-				const cleanupScroll = removeScroll();
-				return () => {
-					runAfterTransitionOutOrImmediate(contentEl, cleanupScroll);
-				};
-			});
+			const cleanupScroll = removeScroll();
+			return () => {
+				runAfterTransitionOutOrImmediate(contentEl, cleanupScroll);
+			};
 		});
 
 		$effect(() => {
