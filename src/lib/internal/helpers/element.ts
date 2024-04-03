@@ -24,3 +24,7 @@ export type Element<TName extends string, TProps extends HTMLElementAttributes> 
 export type DataMeltProp<TName extends string> = {
 	[N in TName]: Record<`data-melt-${N}`, "">;
 }[TName];
+
+export function dataMeltSelector<TName extends string>(name: TName) {
+	return `[data-melt-${name}]` as const;
+}
