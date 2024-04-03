@@ -8,6 +8,7 @@ export * from "./id.js";
 export * from "./is.js";
 export * from "./keyboard.js";
 export * from "./lifecycle.svelte.js";
+export * from "./math.js";
 export * from "./platform.js";
 export * from "./polygon/index.js";
 export * from "./portal.js";

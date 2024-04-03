@@ -25,10 +25,23 @@ export class DerivedBox<T> implements ReadableBox<T> {
 export type ReadableProp<T> = T | Getter<T>;
 export type WritableProp<T> = T | { get: Getter<T>; set: Setter<T> };
 
-export function readableBox<T>(value: ReadableProp<T>): ReadableBox<T> {
+export type ReadableBoxConfig = {
+	proxy?: boolean;
+};
+
+export function readableBox<T>(
+	value: ReadableProp<T>,
+	{ proxy = false }: ReadableBoxConfig = {},
+): ReadableBox<T> {
 	if (typeof value === "function") {
 		return new DerivedBox(value as Getter<T>);
 	}
+
+	if (proxy) {
+		const boxed = $state({ value });
+		return boxed;
+	}
+
 	return { value };
 }
 
