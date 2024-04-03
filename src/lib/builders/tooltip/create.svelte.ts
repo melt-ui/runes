@@ -1,11 +1,11 @@
 import {
+	useEventListener,
 	useFloating,
 	usePortal,
 	type FloatingConfig,
 	type PortalTarget,
 } from "$lib/internal/actions/index.js";
 import {
-	addEventListener,
 	autoDestroyEffectRoot,
 	booleanAttr,
 	element,
@@ -16,6 +16,7 @@ import {
 	makeHullFromElements,
 	noop,
 	pointInPolygon,
+	portalAttr,
 	readableBox,
 	styleToString,
 	writableBox,
@@ -147,32 +148,36 @@ export class Tooltip {
 
 	// Helpers
 	#clearOpenTimeout() {
-		if (this.#openTimeout !== null) {
-			window.clearTimeout(this.#openTimeout);
-			this.#openTimeout = null;
+		if (this.#openTimeout === null) {
+			return;
 		}
+		window.clearTimeout(this.#openTimeout);
+		this.#openTimeout = null;
 	}
 
 	#clearCloseTimeout() {
-		if (this.#closeTimeout !== null) {
-			window.clearTimeout(this.#closeTimeout);
-			this.#closeTimeout = null;
+		if (this.#closeTimeout === null) {
+			return;
 		}
+		window.clearTimeout(this.#closeTimeout);
+		this.#closeTimeout = null;
 	}
 
-	#openTooltip(reason: OpenReason) {
+	#open(reason: OpenReason) {
 		this.#clearCloseTimeout();
 
-		if (this.#openTimeout === null) {
-			this.#openTimeout = window.setTimeout(() => {
-				this.open = true;
-				// Don't override the reason if it's already set.
-				this.#openReason ??= reason;
-			}, this.openDelay);
+		if (this.#openTimeout !== null) {
+			return;
 		}
+
+		this.#openTimeout = window.setTimeout(() => {
+			this.open = true;
+			// Don't override the reason if it's already set.
+			this.#openReason ??= reason;
+		}, this.openDelay);
 	}
 
-	#closeTooltip(isBlur?: boolean) {
+	#close(isBlur: boolean = false) {
 		this.#clearOpenTimeout();
 
 		if (isBlur && this.#isMouseInTooltipArea) {
@@ -184,87 +189,98 @@ export class Tooltip {
 			return;
 		}
 
-		if (this.#closeTimeout === null) {
-			this.#closeTimeout = window.setTimeout(() => {
-				this.open = false;
-				this.#openReason = null;
-				if (isBlur) this.#clickedTrigger = false;
-			}, this.closeDelay);
+		if (this.#closeTimeout !== null) {
+			return;
 		}
+
+		this.#closeTimeout = window.setTimeout(() => {
+			this.open = false;
+			this.#openReason = null;
+			if (isBlur) {
+				this.#clickedTrigger = false;
+			}
+		}, this.closeDelay);
 	}
 
 	// Elements
 	trigger() {
-		const self = this;
+		const tooltip = this;
 		return element("tooltip-trigger", {
-			get "aria-describedby"() {
-				return self.contentId;
-			},
 			get id() {
-				return self.triggerId;
+				return tooltip.triggerId;
+			},
+			get "aria-describedby"() {
+				return tooltip.contentId;
 			},
 			onpointerdown() {
-				if (!self.closeOnPointerDown) return;
-				self.open = false;
-				self.#clickedTrigger = true;
+				if (tooltip.closeOnPointerDown) {
+					tooltip.open = false;
+					tooltip.#clickedTrigger = true;
+				}
 			},
-			onpointerenter(e: PointerEvent) {
-				if (isTouch(e)) return;
-				self.#openTooltip("pointer");
+			onpointerenter(event) {
+				if (isTouch(event)) {
+					return;
+				}
+				tooltip.#open("pointer");
 			},
-			onpointerleave(e: PointerEvent) {
-				if (isTouch(e)) return;
-				self.#clearOpenTimeout();
+			onpointerleave(event) {
+				if (isTouch(event)) {
+					return;
+				}
+				tooltip.#clearOpenTimeout();
 			},
 			onfocus() {
-				if (self.#clickedTrigger) return;
-				self.#openTooltip("focus");
+				if (tooltip.#clickedTrigger) {
+					return;
+				}
+				tooltip.#open("focus");
 			},
 			onblur() {
-				self.#closeTooltip(true);
+				tooltip.#close(true);
 			},
-			onkeydown: self.#handleKeyDown.bind(self),
+			onkeydown: tooltip.#handleKeyDown.bind(tooltip),
 		});
 	}
 
-	#handleKeyDown(e: KeyboardEvent) {
-		if (this.closeOnEscape && e.key === kbd.ESCAPE) {
+	#handleKeyDown(event: KeyboardEvent) {
+		if (this.closeOnEscape && event.key === kbd.ESCAPE) {
 			this.open = false;
 		}
 	}
 
 	content() {
-		const self = this;
+		const tooltip = this;
 		return element("tooltip-content", {
 			role: "tooltip",
 			tabindex: -1,
+			get id() {
+				return tooltip.contentId;
+			},
 			get hidden() {
-				return booleanAttr(self.#hidden);
+				return booleanAttr(tooltip.#hidden);
 			},
 			get style() {
-				return self.#hidden ? "display: none;" : undefined;
-			},
-			get id() {
-				return self.contentId;
+				return tooltip.#hidden ? "display: none;" : undefined;
 			},
 			get "data-portal"() {
-				return self.portal !== null ? "" : undefined;
+				return portalAttr(tooltip.portal);
 			},
 			onpointerenter() {
-				self.#openTooltip("pointer");
+				tooltip.#open("pointer");
 			},
 			onpointerdown() {
-				self.#openTooltip("pointer");
+				tooltip.#open("pointer");
 			},
 		});
 	}
 
 	arrow() {
-		const self = this;
+		const tooltip = this;
 		return element("tooltip-arrow", {
 			"data-arrow": true,
 			get style() {
-				const size = `var(--arrow-size, ${self.arrowSize}px)`;
+				const size = `var(--arrow-size, ${tooltip.arrowSize}px)`;
 				return styleToString({
 					position: "absolute",
 					width: size,
@@ -278,90 +294,87 @@ export class Tooltip {
 	readonly destroy = autoDestroyEffectRoot(() => {
 		$effect(() => {
 			const group = this.group;
-			if (group === undefined || group === false) return;
-
-			const cleanup = () => {
-				if (openTooltips.get(group) === this) {
-					openTooltips.delete(group);
-				}
-			};
-
-			if (!this.open) {
-				cleanup();
+			if (group === undefined || group === false || !this.open) {
 				return;
 			}
 
 			// Close the currently open tooltip in the same group
-			// and set this tooltip as the open one.
+			// and replace it with this one.
 			const openTooltip = openTooltips.get(group);
-			if (openTooltip && openTooltip !== this) {
+			if (openTooltip !== undefined && openTooltip !== this) {
 				openTooltip.open = false;
 			}
 			openTooltips.set(group, this);
-			return cleanup;
+
+			return () => {
+				if (openTooltips.get(group) === this) {
+					openTooltips.delete(group);
+				}
+			};
 		});
 
 		$effect(() => {
-			if (!this.open) return;
-			return addEventListener(document, "mousemove", (e) => {
+			if (!this.open) {
+				return;
+			}
+
+			useEventListener(document, "mousemove", (event) => {
 				const triggerEl = document.getElementById(this.triggerId);
 				const contentEl = document.getElementById(this.contentId);
-				if (triggerEl === null || contentEl === null) return;
+				if (triggerEl === null || contentEl === null) {
+					return;
+				}
 
 				const polygonElements = this.disableHoverableContent ? [triggerEl] : [triggerEl, contentEl];
 				const polygon = makeHullFromElements(polygonElements);
 
 				this.#isMouseInTooltipArea = pointInPolygon(
 					{
-						x: e.clientX,
-						y: e.clientY,
+						x: event.clientX,
+						y: event.clientY,
 					},
 					polygon,
 				);
 
-				if (this.#openReason !== "pointer") return;
-
-				if (!this.#isMouseInTooltipArea) {
-					this.#closeTooltip();
+				if (this.#openReason === "pointer" && !this.#isMouseInTooltipArea) {
+					this.#close();
 				}
 			});
 		});
 
-		$effect(() => {
-			return addEventListener(document, "keydown", this.#handleKeyDown.bind(this));
-		});
+		useEventListener(document, "keydown", this.#handleKeyDown.bind(this));
 
-		let unsubFloating = noop;
-		let unsubPortal = noop;
+		let cleanupFloating = noop;
+		let cleanupPortal = noop;
 
 		$effect(() => {
 			const triggerEl = document.getElementById(this.triggerId);
 			const contentEl = document.getElementById(this.contentId);
 			if (this.#hidden || triggerEl === null || contentEl === null) {
-				unsubFloating();
-				unsubPortal();
-				unsubFloating = unsubPortal = noop;
+				cleanupFloating();
+				cleanupPortal();
+				cleanupFloating = cleanupPortal = noop;
 				return;
 			}
 
 			const floatingReturn = useFloating(triggerEl, contentEl, this.positioning);
-			unsubFloating();
-			unsubFloating = floatingReturn.destroy;
+			cleanupFloating();
+			cleanupFloating = floatingReturn.destroy;
 
 			if (this.portal === null) {
-				unsubPortal();
-				unsubPortal = noop;
+				cleanupPortal();
+				cleanupPortal = noop;
 				return;
 			}
 
 			const portalDest = getPortalDestination(contentEl, this.portal);
 			const portalReturn = usePortal(contentEl, portalDest);
-			unsubPortal = portalReturn.destroy;
+			cleanupPortal = portalReturn.destroy;
 		});
 
 		return () => {
-			unsubFloating();
-			unsubPortal();
+			cleanupFloating();
+			cleanupPortal();
 		};
 	});
 }

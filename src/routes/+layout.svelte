@@ -1,5 +1,5 @@
 <script>
-	import "../app.postcss";
+	import "../app.css";
 </script>
 
 <main class="mx-auto max-w-lg p-8">

@@ -9,7 +9,9 @@ import type { PropertiesHyphen as StyleObject } from "csstype";
 export function styleToString(style: StyleObject): string {
 	return Object.keys(style).reduce((str, key) => {
 		const value = style[key as keyof StyleObject];
-		if (value === undefined) return str;
+		if (value === undefined) {
+			return str;
+		}
 		return str + `${key}:${value};`;
 	}, "");
 }
