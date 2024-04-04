@@ -4,6 +4,8 @@
 
 This is an experiment that aims to migrate existing Melt UI builders to runes.
 
+EDIT: After experimenting with Runes, we're fairly confident in a API to move forward. See the [Migration plan](MIGRATION.md) for more details.
+
 ### Credits
 
 Most of the work has been done by [Abdelrahman](https://github.com/abdel-17)!
