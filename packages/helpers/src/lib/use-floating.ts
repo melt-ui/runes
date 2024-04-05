@@ -120,7 +120,6 @@ const ARROW_TRANSFORM = {
 	right: "rotate(315deg)",
 };
 
-// TODO: use `$effect` to automatically cleanup
 export function useFloating(
 	reference: HTMLElement | VirtualElement,
 	floating: HTMLElement,
@@ -232,7 +231,8 @@ export function useFloating(
 	// Apply `position` to floating element prior to the computePosition() call.
 	floating.style.position = strategy;
 
-	return {
-		destroy: autoUpdate(reference, floating, compute),
-	};
+	$effect(() => {
+		const cleanup = autoUpdate(reference, floating, compute);
+		return cleanup;
+	});
 }
