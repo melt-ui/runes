@@ -16,6 +16,7 @@ import {
 	size,
 } from "@floating-ui/dom";
 import { isHTMLElement } from "./is.js";
+import { noop } from "./callbacks.js";
 
 /**
  * The floating element configuration.
