@@ -16,7 +16,6 @@ import {
 	size,
 } from "@floating-ui/dom";
 import { isHTMLElement } from "./is.js";
-import { noop } from "./callbacks.js";
 
 /**
  * The floating element configuration.
@@ -25,7 +24,7 @@ import { noop } from "./callbacks.js";
 export type FloatingConfig = {
 	/**
 	 * The initial placement of the floating element.
-	 * @defaultValue `"top"`
+	 * @default "top"
 	 *
 	 * @see https://floating-ui.com/docs/computePosition#placement
 	 */
@@ -45,7 +44,7 @@ export type FloatingConfig = {
 
 	/**
 	 * The strategy to use for positioning.
-	 * @defaultValue `"absolute"`
+	 * @default "absolute"
 	 *
 	 * @see https://floating-ui.com/docs/computePosition#placement
 	 */
@@ -60,7 +59,7 @@ export type FloatingConfig = {
 
 	/**
 	 * The main axis offset or gap between the reference and floating elements.
-	 * @defaultValue `5`
+	 * @default 5
 	 *
 	 * @see https://floating-ui.com/docs/offset#options
 	 */
@@ -68,7 +67,7 @@ export type FloatingConfig = {
 
 	/**
 	 * The virtual padding around the viewport edges to check for overflow.
-	 * @defaultValue `8`
+	 * @default 8
 	 *
 	 * @see https://floating-ui.com/docs/detectOverflow#padding
 	 */
@@ -76,7 +75,7 @@ export type FloatingConfig = {
 
 	/**
 	 * Whether to flip the placement.
-	 * @defaultValue `true`
+	 * @default true
 	 *
 	 * @see https://floating-ui.com/docs/flip
 	 */
@@ -84,7 +83,7 @@ export type FloatingConfig = {
 
 	/**
 	 * Whether the floating element can overlap the reference element.
-	 * @defaultValue `false`
+	 * @default false
 	 *
 	 * @see https://floating-ui.com/docs/shift#options
 	 */
@@ -92,7 +91,7 @@ export type FloatingConfig = {
 
 	/**
 	 * Whether to make the floating element same width as the reference element.
-	 * @defaultValue `false`
+	 * @default false
 	 *
 	 * @see https://floating-ui.com/docs/size
 	 */
@@ -100,7 +99,7 @@ export type FloatingConfig = {
 
 	/**
 	 * Whether the floating element should fit the viewport.
-	 * @defaultValue `false`
+	 * @default false
 	 *
 	 * @see https://floating-ui.com/docs/size
 	 */
@@ -114,15 +113,6 @@ export type FloatingConfig = {
 	boundary?: Boundary;
 };
 
-const defaultConfig = {
-	strategy: "absolute",
-	placement: "top",
-	gutter: 5,
-	flip: true,
-	sameWidth: false,
-	overflowPadding: 8,
-} satisfies FloatingConfig;
-
 const ARROW_TRANSFORM = {
 	bottom: "rotate(45deg)",
 	left: "rotate(135deg)",
@@ -134,29 +124,36 @@ const ARROW_TRANSFORM = {
 export function useFloating(
 	reference: HTMLElement | VirtualElement,
 	floating: HTMLElement,
-	config: FloatingConfig | null = {},
+	config: FloatingConfig = {},
 ) {
-	if (config === null) {
-		return { destroy: noop };
-	}
-
-	const options = { ...defaultConfig, ...config } satisfies FloatingConfig;
+	const {
+		placement = "top",
+		strategy = "absolute",
+		offset: floatingOffset,
+		gutter = 5,
+		overflowPadding = 8,
+		flip: flipPlacement = true,
+		overlap = false,
+		sameWidth = false,
+		fitViewport = false,
+		boundary,
+	} = config;
 
 	const arrowEl = floating.querySelector("[data-arrow=true]");
 	const middleware: Middleware[] = [];
 
-	if (options.flip) {
+	if (flipPlacement) {
 		middleware.push(
 			flip({
-				boundary: options.boundary,
-				padding: options.overflowPadding,
+				boundary,
+				padding: overflowPadding,
 			}),
 		);
 	}
 
 	const arrowOffset = isHTMLElement(arrowEl) ? arrowEl.offsetHeight / 2 : 0;
-	if (options.gutter || options.offset) {
-		const data = options.gutter ? { mainAxis: options.gutter } : options.offset;
+	if (gutter || offset) {
+		const data = gutter ? { mainAxis: gutter } : floatingOffset;
 		if (data?.mainAxis != null) {
 			data.mainAxis += arrowOffset;
 		}
@@ -166,9 +163,9 @@ export function useFloating(
 
 	middleware.push(
 		shift({
-			boundary: options.boundary,
-			crossAxis: options.overlap,
-			padding: options.overflowPadding,
+			boundary,
+			crossAxis: overlap,
+			padding: overflowPadding,
 		}),
 	);
 
@@ -178,16 +175,16 @@ export function useFloating(
 
 	middleware.push(
 		size({
-			padding: options.overflowPadding,
+			padding: overflowPadding,
 			apply({ rects, availableHeight, availableWidth }) {
-				if (options.sameWidth) {
+				if (sameWidth) {
 					Object.assign(floating.style, {
 						width: `${Math.round(rects.reference.width)}px`,
 						minWidth: "unset",
 					});
 				}
 
-				if (options.fitViewport) {
+				if (fitViewport) {
 					Object.assign(floating.style, {
 						maxWidth: `${availableWidth}px`,
 						maxHeight: `${availableHeight}px`,
@@ -198,8 +195,6 @@ export function useFloating(
 	);
 
 	function compute() {
-		const { placement, strategy } = options;
-
 		computePosition(reference, floating, {
 			placement,
 			middleware,
@@ -209,7 +204,7 @@ export function useFloating(
 			const y = Math.round(data.y);
 
 			Object.assign(floating.style, {
-				position: options.strategy,
+				position: strategy,
 				top: `${y}px`,
 				left: `${x}px`,
 			});
@@ -235,9 +230,7 @@ export function useFloating(
 	}
 
 	// Apply `position` to floating element prior to the computePosition() call.
-	Object.assign(floating.style, {
-		position: options.strategy,
-	});
+	floating.style.position = strategy;
 
 	return {
 		destroy: autoUpdate(reference, floating, compute),
