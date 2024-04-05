@@ -1,5 +1,5 @@
 <script lang='ts'>
-	const { data } = $props()
+	const { data } = $props();
 </script>
 
 <h1>Melt UI Showcase</h1>

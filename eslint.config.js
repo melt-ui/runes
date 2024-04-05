@@ -8,6 +8,8 @@ export default config({
 			'max-len': ['error', { code: 120 }],
 			'antfu/if-newline': 'off',
 			'sort-keys': 'off',
+			'curly': ['error', 'multi-line'],
+
 		},
 		semi: true,
 	},
