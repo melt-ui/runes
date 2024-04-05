@@ -6,20 +6,6 @@ const config = {
 	preprocess: vitePreprocess(),
 	kit: {
 		adapter: adapter(),
-		typescript: {
-			config: (config) => {
-				return {
-					...config,
-					include: [
-						...config.include,
-						"../svelte.config.js",
-						"../tailwind.config.js",
-						"../.eslintrc.cjs",
-						"../postcss.config.js",
-					],
-				};
-			},
-		},
 	},
 };
 

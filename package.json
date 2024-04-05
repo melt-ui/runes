@@ -1,65 +1,11 @@
 {
-	"name": "melt-ui-runes-experiment",
-	"version": "0.0.1",
-	"scripts": {
-		"dev": "vite dev",
-		"build": "vite build && npm run package",
-		"preview": "vite preview",
-		"package": "svelte-kit sync && svelte-package && publint",
-		"prepublishOnly": "npm run package",
-		"check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json",
-		"check:watch": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json --watch",
-		"lint": "prettier --check . && eslint .",
-		"format": "prettier --write ."
-	},
-	"exports": {
-		".": {
-			"types": "./dist/index.d.ts",
-			"svelte": "./dist/index.js"
-		}
-	},
-	"files": [
-		"dist",
-		"!dist/**/*.test.*",
-		"!dist/**/*.spec.*"
-	],
-	"peerDependencies": {
-		"svelte": "^4.0.0"
-	},
-	"devDependencies": {
-		"@sveltejs/adapter-auto": "^3.2.0",
-		"@sveltejs/kit": "^2.5.5",
-		"@sveltejs/package": "^2.3.0",
-		"@sveltejs/vite-plugin-svelte": "^3.0.2",
-		"@types/eslint": "8.56.7",
-		"@types/node": "^20.12.3",
-		"@typescript-eslint/eslint-plugin": "^7.5.0",
-		"@typescript-eslint/parser": "^7.5.0",
-		"autoprefixer": "^10.4.19",
-		"eslint": "^8.57.0",
-		"eslint-config-prettier": "^9.1.0",
-		"eslint-plugin-svelte": "2.36.0-next.13",
-		"postcss": "^8.4.38",
-		"postcss-load-config": "^5.0.3",
-		"prettier": "^3.2.5",
-		"prettier-plugin-svelte": "^3.2.2",
-		"prettier-plugin-tailwindcss": "^0.5.13",
-		"publint": "^0.2.7",
-		"svelte": "5.0.0-next.93",
-		"svelte-check": "^3.6.9",
-		"tailwindcss": "^3.4.3",
-		"tslib": "^2.6.2",
-		"typescript": "^5.4.3",
-		"vite": "^5.2.8"
-	},
-	"dependencies": {
-		"@floating-ui/core": "^1.6.0",
-		"@floating-ui/dom": "^1.6.3",
-		"csstype": "^3.1.3",
-		"focus-trap": "^7.5.4",
-		"nanoid": "^5.0.6"
-	},
-	"svelte": "./dist/index.js",
-	"types": "./dist/index.d.ts",
-	"type": "module"
+    "name": "melt-ui-monorepo",
+    "version": "0.0.0",
+    "private": true,
+    "scripts": {
+        "build": "pnpm -r build",
+        "check": "pnpm -r check",
+        "lint": "pnpm -r lint",
+        "lint:fix": "pnpm -r lint:fix"
+    }
 }
