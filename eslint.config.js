@@ -10,6 +10,7 @@ export default config({
 			"antfu/if-newline": "off",
 			"curly": ["error", "multi-line"],
 			"style/brace-style": ["error", "1tbs", { allowSingleLine: true }],
+			"style/arrow-parens": ["error", "always"],
 		},
 	},
 	ignores: [

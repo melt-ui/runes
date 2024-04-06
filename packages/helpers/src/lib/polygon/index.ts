@@ -13,7 +13,7 @@ export function getPointsFromEl(el: HTMLElement): Array<Point> {
 }
 
 export function makeHullFromElements(els: Array<HTMLElement>): Array<Point> {
-	const points = els.flatMap(el => getPointsFromEl(el));
+	const points = els.flatMap((el) => getPointsFromEl(el));
 	return makeHull(points);
 }
 

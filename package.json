@@ -1,14 +1,14 @@
 {
 	"name": "melt-ui-monorepo",
+	"type": "module",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
 		"build": "pnpm -r build",
 		"check": "pnpm -r check",
-		"lint": "pnpm -r lint",
-		"lint:fix": "pnpm -r lint:fix"
+		"lint": "eslint . --ignore-pattern 'packages/**' && pnpm -r lint",
+		"lint:fix": "eslint . --fix --ignore-pattern 'packages/**' && pnpm -r lint:fix"
 	},
-	"type": "module",
 	"devDependencies": {
 		"@antfu/eslint-config": "^2.12.1",
 		"@huntabyte/eslint-plugin": "^0.0.1",
