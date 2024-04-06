@@ -4,14 +4,16 @@ import tailwindPlugin from 'eslint-plugin-tailwindcss';
 export default config({
 	stylistic: {
 		indent: 'tab',
+		quotes: 'double',
+		semi: true,
 		overrides: {
 			'max-len': ['error', { code: 120 }],
 			'antfu/if-newline': 'off',
 			'sort-keys': 'off',
 			'curly': ['error', 'multi-line'],
-
+			'ts/consistent-type-definitions': ['error', 'type'],
+			'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
 		},
-		semi: true,
 	},
 	ignores: [
 		'.DS_Store',
@@ -20,6 +22,8 @@ export default config({
 		'**/node_modules/**',
 		'build',
 		'build/**',
+		'dist',
+		'dist/**',
 		'.svelte-kit',
 		'.svelte-kit/**',
 		'package',
