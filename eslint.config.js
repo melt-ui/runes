@@ -14,6 +14,7 @@ export default config({
 			'jsonc/sort-array-values': 'off',
 			'curly': ['error', 'multi-line'],
 			'ts/consistent-type-definitions': ['error', 'type'],
+			'ts/no-this-alias': 'off',
 			'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],
 		},
 	},

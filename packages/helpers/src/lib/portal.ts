@@ -1,4 +1,4 @@
-import type { PortalTarget } from "./use-portal.js";
+import type { PortalTarget } from "./use-portal.svelte.js";
 import { isHTMLElement } from "./is.js";
 
 /**

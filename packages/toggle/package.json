@@ -1,5 +1,5 @@
 {
-	"name": "@melt-ui/label",
+	"name": "@melt-ui/toggle",
 	"type": "module",
 	"version": "0.0.1",
 	"exports": {
@@ -23,7 +23,6 @@
 		"lint:fix": "eslint . --fix --config ../../eslint.config.js",
 		"prepublishOnly": "pnpm run package"
 	},
-	"svelte": "./dist/index.js",
 	"peerDependencies": {
 		"@melt-ui/helpers": "workspace:^",
 		"svelte": "^4.0.0"
@@ -39,5 +38,6 @@
 		"tslib": "^2.6.2",
 		"typescript": "^5.4.4",
 		"vite": "^5.2.8"
-	}
+	},
+	"svelte": "./dist/index.js"
 }
