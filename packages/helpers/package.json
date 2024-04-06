@@ -23,7 +23,6 @@
 		"lint:fix": "eslint . --fix --config ../../eslint.config.js",
 		"prepublishOnly": "pnpm run package"
 	},
-	"svelte": "./dist/index.js",
 	"peerDependencies": {
 		"svelte": "^4.0.0"
 	},
@@ -45,5 +44,6 @@
 		"tslib": "^2.4.1",
 		"typescript": "^5.4.4",
 		"vite": "^5.2.8"
-	}
+	},
+	"svelte": "./dist/index.js"
 }
