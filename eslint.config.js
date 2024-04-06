@@ -10,6 +10,8 @@ export default config({
 			'max-len': ['error', { code: 120 }],
 			'antfu/if-newline': 'off',
 			'sort-keys': 'off',
+			'jsonc/sort-keys': 'off',
+			'jsonc/sort-array-values': 'off',
 			'curly': ['error', 'multi-line'],
 			'ts/consistent-type-definitions': ['error', 'type'],
 			'style/brace-style': ['error', '1tbs', { allowSingleLine: true }],

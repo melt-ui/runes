@@ -12,7 +12,6 @@ export function styleToString(style: StyleObject): string {
 		if (value === undefined) {
 			return str;
 		}
-
 		return `${str}${key}:${value};`;
 	}, "");
 }

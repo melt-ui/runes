@@ -1,6 +1,5 @@
 {
 	"name": "melt-ui-monorepo",
-	"type": "module",
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
@@ -9,6 +8,7 @@
 		"lint": "pnpm -r lint",
 		"lint:fix": "pnpm -r lint:fix"
 	},
+	"type": "module",
 	"devDependencies": {
 		"@antfu/eslint-config": "^2.12.1",
 		"@types/eslint": "8.56.7",
