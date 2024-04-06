@@ -2,7 +2,7 @@ import { element } from "@melt-ui/helpers";
 
 export class Label {
 	/**
-	 * The root element's props.
+	 * Returns the root element's props.
 	 *
 	 * @example
 	 * ```svelte

@@ -1,2 +1,2 @@
-export * from "./create.svelte.js";
-export * from "./types.js";
+export { Toggle } from "./create.svelte.js";
+export type { ToggleProps } from "./types.js";
