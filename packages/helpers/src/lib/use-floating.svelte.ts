@@ -16,6 +16,7 @@ import {
 	size,
 } from "@floating-ui/dom";
 import { isHTMLElement } from "./is.js";
+import { noop } from "./callbacks.js";
 
 /**
  * The floating element configuration.
@@ -123,8 +124,12 @@ const ARROW_TRANSFORM = {
 export function useFloating(
 	reference: HTMLElement | VirtualElement,
 	floating: HTMLElement,
-	config: FloatingConfig = {},
+	config: FloatingConfig | null = {},
 ) {
+	if (config === null) {
+		return { destroy: noop };
+	}
+
 	const {
 		placement = "top",
 		strategy = "absolute",
@@ -231,8 +236,6 @@ export function useFloating(
 	// Apply `position` to floating element prior to the computePosition() call.
 	floating.style.position = strategy;
 
-	$effect(() => {
-		const cleanup = autoUpdate(reference, floating, compute);
-		return cleanup;
-	});
+	const destroy = autoUpdate(reference, floating, compute);
+	return { destroy };
 }
