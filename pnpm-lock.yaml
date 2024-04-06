@@ -11,6 +11,9 @@ importers:
       '@antfu/eslint-config':
         specifier: ^2.12.1
         version: 2.12.1(@vue/compiler-sfc@3.4.21)(eslint-plugin-svelte@2.36.0-next.13)(eslint@8.57.0)(svelte-eslint-parser@0.33.1)(typescript@5.4.4)
+      '@huntabyte/eslint-plugin':
+        specifier: ^0.0.1
+        version: 0.0.1(eslint@8.57.0)
       '@types/eslint':
         specifier: 8.56.7
         version: 8.56.7
@@ -616,6 +619,14 @@ packages:
 
   /@humanwhocodes/object-schema@2.0.3:
     resolution: {integrity: sha512-93zYdMES/c1D69yZiKDBj0V24vqNzB/koF26KPaagAfd3P/4gUlh3Dys5ogAK+Exi9QyzlD8x/08Zt7wIKcDcA==}
+    dev: true
+
+  /@huntabyte/eslint-plugin@0.0.1(eslint@8.57.0):
+    resolution: {integrity: sha512-Ksf//Ey+BcnUxvzKHTzyjZXzrfdnEda2rrNv9ygl4dlQHSI9WY9fhlh9Fn1LPqrWUz66mQHk0Bw/4wEf4R+XIw==}
+    peerDependencies:
+      eslint: '*'
+    dependencies:
+      eslint: 8.57.0
     dev: true
 
   /@isaacs/cliui@8.0.2:
