@@ -1,5 +1,4 @@
 import config from "@antfu/eslint-config";
-import huntabytePlugin from "@huntabyte/eslint-plugin";
 
 export default config({
 	stylistic: {
@@ -11,6 +10,9 @@ export default config({
 			"curly": ["error", "multi-line"],
 			"style/brace-style": ["error", "1tbs", { allowSingleLine: true }],
 			"style/arrow-parens": ["error", "always"],
+			"ts/consistent-type-definitions": ["error", "type"],
+			"ts/no-this-alias": "off",
+			"ts/no-explicit-any": "error",
 		},
 	},
 	ignores: [
@@ -42,19 +44,4 @@ export default config({
 	svelte: true,
 	typescript: true,
 	componentExts: ["svelte"],
-}).override("antfu/typescript/rules", {
-	rules: {
-		"ts/consistent-type-definitions": ["error", "type"],
-		"ts/no-this-alias": "off",
-		"ts/no-explicit-any": "error",
-	},
-}).override("antfu/svelte/setup", {
-	plugins: {
-		huntabyte: huntabytePlugin,
-	},
-}).override("antfu/svelte/rules", {
-	rules: {
-		"prefer-const": "off",
-		"huntabyte/top-level-function": "error",
-	},
 });
