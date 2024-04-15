@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { Slider } from "@melt-ui/slider";
+	import { createToggle } from "@melt-ui/toggle";
 
 	const slider = new Slider();
 
@@ -8,10 +9,24 @@
 		max: 10,
 		step: 3,
 	});
+
+	const toggle = createToggle({
+		pressed: false,
+	});
+	toggle.disabled = false;
+	toggle.pressed = true;
 </script>
 
 <main class="p-8">
-	<h1>Slider</h1>
+	<h1 class="text-4xl font-bold mb-4">Docs</h1>
+
+	<h2 class="mt-8">Toggle</h2>
+	<section aria-label="Example">
+		<button {...toggle.root} class="flex items-center">
+			{toggle.pressed ? "On" : "Off"}
+		</button>
+
+	<h2>Slider</h2>
 	<section aria-label="Example">
 		<div {...slider.root()} class="flex h-10 w-[12.5rem] items-center">
 			<div class="h-1 w-full rounded-full bg-neutral-300" />
@@ -40,4 +55,5 @@
 			{/each}
 		</div>
 	</section>
+
 </main>

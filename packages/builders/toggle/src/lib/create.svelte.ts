@@ -4,7 +4,10 @@ import {
 	booleanAttr,
 	element,
 	kbd,
+	pack,
+	pick,
 	readableBox,
+	toBoxes,
 	writableBox,
 } from "@melt-ui/helpers";
 import type { ToggleProps } from "./types.js";
@@ -62,4 +65,42 @@ export class Toggle {
 			},
 		});
 	}
+}
+
+export function createToggle(props: ToggleProps = {}) {
+	const { pressed, disabled } = toBoxes({
+		readables: pick({ disabled: false, ...props }, ["disabled"]),
+		writables: pick({ pressed: false, ...props }, ["pressed"]),
+	});
+
+	const root = element("toggle", {
+		"type": "button",
+		get "aria-pressed"() {
+			return pressed.value;
+		},
+		get "disabled"() {
+			return booleanAttr(disabled.value);
+		},
+		get "data-disabled"() {
+			return booleanAttr(disabled.value);
+		},
+		get "data-state"() {
+			return pressed.value ? "on" : "off";
+		},
+		onclick() {
+			if (disabled.value) {
+				return;
+			}
+			pressed.value = !pressed.value;
+		},
+		onkeydown(event) {
+			if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
+				return;
+			}
+			event.preventDefault();
+			this.onclick();
+		},
+	});
+
+	return pack({ root, pressed, disabled });
 }
