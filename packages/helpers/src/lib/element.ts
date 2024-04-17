@@ -1,5 +1,6 @@
 import type { HTMLAttributes } from "svelte/elements";
 import type { Prettify } from "./types.js";
+import { isFunction } from "./is.js";
 
 export type HTMLElementAttributes = HTMLAttributes<HTMLElement>;
 
@@ -9,12 +10,13 @@ export type HTMLElementEvent<TEvent extends Event = Event> = TEvent & {
 
 export function element<const TName extends string, const TProps extends HTMLElementAttributes>(
 	name: TName,
-	props: TProps,
+	props: TProps | (() => TProps),
 ): Element<TName, TProps>;
 
-export function element(name: string, props: HTMLElementAttributes) {
-	props[`data-melt-${name}`] = "";
-	return props;
+export function element(name: string, props: HTMLElementAttributes | (() => HTMLElementAttributes)) {
+	const returned = isFunction(props) ? props() : props;
+	returned[`data-melt-${name}`] = "";
+	return returned;
 }
 
 export type Element<TName extends string, TProps extends HTMLElementAttributes> = Prettify<

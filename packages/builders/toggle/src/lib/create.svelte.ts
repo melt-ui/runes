@@ -1,106 +1,51 @@
 import {
-	type ReadableBox,
-	type WritableBox,
 	booleanAttr,
 	element,
 	kbd,
-	pack,
-	pick,
-	readableBox,
-	toBoxes,
-	writableBox,
+	receiveObj,
 } from "@melt-ui/helpers";
 import type { ToggleProps } from "./types.js";
 
-export class Toggle {
-	#pressedBox: WritableBox<boolean>;
-	#disabledBox: ReadableBox<boolean>;
-
-	constructor(props: ToggleProps = {}) {
-		const { pressed = false, disabled = false } = props;
-		this.#pressedBox = writableBox(pressed);
-		this.#disabledBox = readableBox(disabled);
-	}
-
-	get pressed() {
-		return this.#pressedBox.value;
-	}
-
-	set pressed(v: boolean) {
-		this.#pressedBox.value = v;
-	}
-
-	get disabled() {
-		return this.#disabledBox.value;
-	}
-
-	root() {
-		const toggle = this;
-		return element("toggle", {
-			"type": "button",
-			get "aria-pressed"() {
-				return toggle.pressed;
-			},
-			get "disabled"() {
-				return booleanAttr(toggle.disabled);
-			},
-			get "data-disabled"() {
-				return booleanAttr(toggle.disabled);
-			},
-			get "data-state"() {
-				return toggle.pressed ? "on" : "off";
-			},
-			onclick() {
-				if (toggle.disabled) {
-					return;
-				}
-				toggle.pressed = !toggle.pressed;
-			},
-			onkeydown(event) {
-				if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
-					return;
-				}
-				event.preventDefault();
-				this.onclick();
-			},
-		});
-	}
-}
-
-export function createToggle(props: ToggleProps = {}) {
-	const { pressed, disabled } = toBoxes({
-		readables: pick({ disabled: false, ...props }, ["disabled"]),
-		writables: pick({ pressed: false, ...props }, ["pressed"]),
+export function createToggle(_props: ToggleProps = {}) {
+	const props = receiveObj(_props, {
+		pressed: false,
+		disabled: false,
 	});
 
-	const root = element("toggle", {
-		"type": "button",
-		get "aria-pressed"() {
-			return pressed.value;
-		},
-		get "disabled"() {
-			return booleanAttr(disabled.value);
-		},
-		get "data-disabled"() {
-			return booleanAttr(disabled.value);
-		},
-		get "data-state"() {
-			return pressed.value ? "on" : "off";
-		},
-		onclick() {
-			if (disabled.value) {
+	const root = element("toggle", () => {
+		function onclick() {
+			if (props.disabled) {
 				return;
 			}
-			pressed.value = !pressed.value;
-		},
-		onkeydown(event) {
+			props.pressed = !props.pressed;
+		}
+
+		function onkeydown(event: KeyboardEvent) {
 			if (event.key !== kbd.ENTER && event.key !== kbd.SPACE) {
 				return;
 			}
 			event.preventDefault();
-			this.onclick();
-		},
+			onclick();
+		}
+
+		return ({
+			"type": "button",
+			get "aria-pressed"() {
+				return props.pressed;
+			},
+			get "disabled"() {
+				return booleanAttr(props.disabled);
+			},
+			get "data-disabled"() {
+				return booleanAttr(props.disabled);
+			},
+			get "data-state"() {
+				return props.pressed ? "on" : "off";
+			},
+			onclick,
+			onkeydown,
+		});
 	});
 
-	return pack({ root, pressed, disabled });
+	return Object.assign(props, { root });
 }

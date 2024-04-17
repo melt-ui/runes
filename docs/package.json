@@ -12,6 +12,7 @@
 		"sync": "svelte-kit sync"
 	},
 	"devDependencies": {
+		"@melt-ui/helpers": "workspace:^",
 		"@melt-ui/slider": "workspace:^",
 		"@melt-ui/toggle": "workspace:^",
 		"@sveltejs/adapter-auto": "^3.0.0",
@@ -20,7 +21,7 @@
 		"autoprefixer": "^10.4.16",
 		"postcss": "^8.4.32",
 		"postcss-load-config": "^5.0.2",
-		"svelte": "^5.0.0-next.95",
+		"svelte": "^5.0.0-next.107",
 		"svelte-check": "^3.6.0",
 		"tailwindcss": "^3.3.6",
 		"tslib": "^2.4.1",

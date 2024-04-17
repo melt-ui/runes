@@ -25,3 +25,5 @@ export * from "./use-interact-outside.js";
 export * from "./use-modal.svelte.js";
 export * from "./use-portal.svelte.js";
 export * from "./object.js";
+export * from "./string.js";
+export * from "./transport.svelte.js";

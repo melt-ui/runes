@@ -11,3 +11,9 @@ export function pick<O extends object, const T extends keyof O>(obj: O, keys: T[
 		return n;
 	}, {} as Pick<O, T>);
 }
+
+type KeysWithoutSymbols<T> = Exclude<keyof T, symbol> & string;
+
+export function keys<O extends object>(obj: O) {
+	return Object.keys(obj) as (KeysWithoutSymbols<O>)[];
+}
